@@ -89,6 +89,10 @@ The Carrier scan data-flow specification covers staging, the CI-422 count mismat
 
 For “how often” and “how frequently” questions, retrieval checks for a recurring interval in the source. An unqualified question uses the selected pipeline’s schedule. Named jobs and qualifiers must match evidence in the same sentence. On twelve schedule fixtures, the lexical baseline answered one of six supported questions and declined all six unsupported ones. The added check answered all six supported cases and preserved all six abstentions. Overall, 74 of 87 labeled questions passed. The remaining thirteen supported questions received no answer.
 
+### Active-writer recovery
+
+The writer-recovery evaluation covers concurrent writes, foreign job identifiers, forced restarts, and writer termination. The lexical baseline scored 6/10 on these questions. Requiring evidence for the requested action raised the result to 10/10 and recovered one earlier paraphrase. Across 97 labeled questions, 85 produced the expected result and 12 supported questions received no answer.
+
 ### Build-time version synchronization
 
 The Markdown repository keeps the initial file at `docs/<pipeline>/<id>.md`. Add a revision alongside it as `<id>@<major>.<minor>.md` with a matching `Version` header. Run `npm run build` to refresh the local Worker bundle. Each build reads the repository and selects the highest numeric version per pipeline and document ID. Older text stays in the source repository. Only the current revision enters the deployed index and source viewer. A superseded citation returns HTTP 404.

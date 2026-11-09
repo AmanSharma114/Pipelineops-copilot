@@ -1,0 +1,71 @@
+[
+  {
+    "split": "writer-recovery",
+    "app": "ledger",
+    "question": "Can I restart while a writer is active?",
+    "expected": {
+      "doc": "runbook",
+      "section": 2
+    }
+  },
+  {
+    "split": "writer-recovery",
+    "app": "ledger",
+    "question": "Another job is still writing. Can I restart route_merge?",
+    "expected": {
+      "doc": "runbook",
+      "section": 2
+    }
+  },
+  {
+    "split": "writer-recovery",
+    "app": "ledger",
+    "question": "Do I wait for the active writer before replay?",
+    "expected": {
+      "doc": "runbook",
+      "section": 2
+    }
+  },
+  {
+    "split": "writer-recovery",
+    "app": "dispatch",
+    "question": "Can I restart while a writer is active?",
+    "expected": null
+  },
+  {
+    "split": "writer-recovery",
+    "app": "intake",
+    "question": "Can I restart while a writer is active?",
+    "expected": null
+  },
+  {
+    "split": "writer-recovery",
+    "app": "ledger",
+    "question": "Can I force a restart while a writer is active?",
+    "expected": null
+  },
+  {
+    "split": "writer-recovery",
+    "app": "ledger",
+    "question": "Can I kill the active writer before replay?",
+    "expected": null
+  },
+  {
+    "split": "writer-recovery",
+    "app": "ledger",
+    "question": "Can I restart board_publish while a writer is active?",
+    "expected": null
+  },
+  {
+    "split": "writer-recovery",
+    "app": "ledger",
+    "question": "How long does the active writer take to finish?",
+    "expected": null
+  },
+  {
+    "split": "writer-recovery",
+    "app": "ledger",
+    "question": "Can I restart while a writer is active after CI-422?",
+    "expected": null
+  }
+]

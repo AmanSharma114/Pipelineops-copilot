@@ -22,11 +22,13 @@ const retention = /\b(?:retain(?:s|ed|ing)?|retention|kept|keep(?:s|ing)?)\b/i;
 const duration = /\b(?:\d+|one|two|three|four|five|six|seven|eight|nine|ten)\s+(?:hours?|days?|weeks?|months?|years?)\b/i;
 const frequencyQuestion = /\bhow (?:often|frequently)\b/i;
 const recurrence = /\b(?:(?:each|every)\s+(?:(?:\d+|one|two|three|four|five|ten|fifteen|thirty)\s+)?(?:minutes?|hours?|days?|weeks?|months?)|hourly|daily|weekly|monthly)\b/i;
+const writerLanguage = /\b(?:writers?|writing)\b/i;
 export function questionFact(query) {
   if (approval.test(query)) return 'approval';
   if (/\bretention\b/i.test(query) || (/\bhow (?:long|many)\b/i.test(query) &&
       (retention.test(query) || /\broll back\b/i.test(query)))) return 'retention';
   if (frequencyQuestion.test(query)) return 'frequency';
+  if (writerLanguage.test(query)) return 'writer';
   return null;
 }
 
@@ -56,6 +58,15 @@ function factTerms(text) {
 
 function supportsFact(row, query, fact) {
   if (fact === 'frequency') return frequencyMatch(row, query);
+  if (fact === 'writer') {
+    // Require the condition and the requested operation in the same section.
+    // Unmentioned actions such as killing a writer must survive normalization.
+    const normalized = query.toLowerCase()
+      .replace(/\b(?:(?:another|a|the) (?:process|job) is )?still writing\b/g, 'active writer')
+      .replace(/\b(?:run )?recovery\b/g, 'restart')
+      .replace(/\b(?:while|before|has|have)\b/g, ' ');
+    return terms(normalized).every(term => row.title.includes(term) || row.words.includes(term));
+  }
   const relation = fact === 'approval' ? approval : retention;
   const requested = factTerms(query.replace(relation, ''));
   if (!requested.length) return false;

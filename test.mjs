@@ -125,6 +125,16 @@ test('Index status reflects deployed versions and links only within its pipeline
   assert.equal(get('/index-status?app=unknown').status, 404);
 });
 const ask = (app,q) => get('/?'+ new URLSearchParams({app,q})).text();
+test('Writer recovery requires documented instructions for the requested operation', async () => {
+  const answer = await ask('ledger', 'Another process is still writing. Is it safe to run recovery?');
+  assert.match(answer, /wait for any active writer to finish/);
+  assert.match(answer, /doc=runbook&v=2\.1#s2/);
+  for (const [app, question] of [
+    ['ledger','Can I kill the active writer before replay?'],
+    ['dispatch','Can I restart with an active writer?'],
+    ['ledger','Can I force a restart while a writer is active?']
+  ]) assert.match(await ask(app, question), /INSUFFICIENT EVIDENCE/);
+});
 test('Tied sections are browsable without claiming an answer', async () => {
   const html = await ask('dispatch', 'watermark');
   assert.match(html, /INSUFFICIENT EVIDENCE/);
