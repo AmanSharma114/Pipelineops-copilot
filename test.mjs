@@ -125,6 +125,22 @@ test('Index status reflects deployed versions and links only within its pipeline
   assert.equal(get('/index-status?app=unknown').status, 404);
 });
 const ask = (app,q) => get('/?'+ new URLSearchParams({app,q})).text();
+test('Tied sections are browsable without claiming an answer', async () => {
+  const html = await ask('dispatch', 'watermark');
+  assert.match(html, /INSUFFICIENT EVIDENCE/);
+  const choices = html.match(/<nav class="section-choices"[^>]*>(.*?)<\/nav>/s)[1];
+  const urls = [...choices.matchAll(/href="([^"]+)"/g)].map(match => new URL(match[1], 'https://test.invalid'));
+  assert.deepEqual(urls.map(url => url.hash), ['#s0', '#s2']);
+  for (const url of urls) {
+    assert.equal(url.searchParams.get('app'), 'dispatch');
+    const source = await get(url.pathname + url.search).text();
+    assert.ok(source.includes('id="' + url.hash.slice(1) + '"'));
+    assert.ok(source.includes('/?app=dispatch&q=watermark#answer'));
+  }
+  for (const question of ['CI-422', 'DB-410', 'DH-118']) {
+    assert.ok(!(await ask('dispatch', question)).includes('<nav class="section-choices"'));
+  }
+});
 test('Unqualified frequency questions resolve to the selected pipeline schedule', async () => {
   for (const [app, cadence] of [['intake','every five minutes'], ['ledger','15 and 45 minutes past each hour'], ['dispatch','five minutes past each hour']]) {
     const html = await ask(app, 'How often does it run?');
