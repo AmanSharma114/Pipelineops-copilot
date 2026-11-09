@@ -12,7 +12,11 @@ Aman Sharma built this independent portfolio demo around a support engineer's ev
 2. Follow the citation beneath the excerpt. The source viewer highlights the matching section of runbook v1.2.
 3. Try [the same error code under Route Ledger](https://pipelineops-freight-copilot.aamansharmamu114.chatgpt.site/?app=ledger&q=CI-204). The backend searches only that pipeline and reports insufficient evidence.
 
-The public retriever returned the expected section or abstention on 55 of 68 labeled questions. It missed 13 supported questions and produced zero wrong citations on that set. The evaluation below includes the offline embedding comparison and the reasons for keeping the public baseline.
+On the current 125 labeled questions, the deployed handler produced 117 expected outcomes. It declined eight supported questions and returned zero wrong citations. Run `node eval.mjs` to verify the versioned excerpt and source section for each supported answer.
+
+### Local request latency
+
+`npm run benchmark` builds the Worker and replays the same labeled questions through its normal support-desk route. On Windows x64 with Node v24.22.1, one run recorded a median of **0.128 ms** and a **95th percentile of 0.380 ms** across 1,250 sequential requests after 125 warm-up requests. Timing starts with the constructed request and ends after reading the HTML response body. It covers local retrieval and page rendering. Network transit, cold starts, browser rendering, and source-link navigation are outside the measurement.
 
 ## Run locally
 

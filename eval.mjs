@@ -1,12 +1,11 @@
 import './build.mjs';
-import { readFile } from 'node:fs/promises';
+import { loadQuestions } from './eval/fixtures.mjs';
 
 const { default: worker } = await import('./dist/server/index.js');
-const cases = [];
-for (const file of ['cases.json', 'three-pipeline.json', 'paraphrases.json', 'evidence.json', 'validation.json', 'cadence.json', 'writer-recovery.json', 'code-lookup.json', 'deadlines.json', 'approval-actions.json']) {
-  cases.push(...JSON.parse(await readFile(new URL('./eval/' + file, import.meta.url))));
-}
+const cases = await loadQuestions();
 let failures = 0;
+let wrongCitations = 0;
+let unanswered = 0;
 for (const split of new Set(cases.map(item => item.split))) {
   let correct = 0;
   let abstentions = 0;
@@ -36,9 +35,12 @@ for (const split of new Set(cases.map(item => item.split))) {
     if (passed) correct++;
     else {
       failures++;
+      if (href) wrongCitations++;
+      else if (expected && answer.includes('INSUFFICIENT EVIDENCE')) unanswered++;
       console.log(`  Miss: ${app} | ${question} | ${href ?? 'no citation'}`);
     }
   }
   console.log(`${split}: ${correct}/${group.length} correct; supported ${correct-abstentions}/${group.length-unsupported}; unsupported ${abstentions}/${unsupported}`);
 }
+console.log(`Overall: ${cases.length - failures}/${cases.length} correct, ${unanswered} supported questions unanswered, ${wrongCitations} wrong citations`);
 if (failures) process.exitCode = 1;

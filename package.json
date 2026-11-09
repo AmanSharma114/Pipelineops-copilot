@@ -1,1 +1,1 @@
-{"name":"pipelineops-copilot","private":true,"type":"module","scripts":{"build":"node build.mjs","start":"node serve.mjs","test":"node --test test.mjs"},"engines":{"node":">=22"}}
+{"name":"pipelineops-copilot","private":true,"type":"module","scripts":{"build":"node build.mjs","start":"node serve.mjs","test":"node --test test.mjs","benchmark":"node eval/latency.mjs"},"engines":{"node":">=22"}}
