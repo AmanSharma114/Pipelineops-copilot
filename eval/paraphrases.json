@@ -1,0 +1,146 @@
+[
+  {
+    "split": "paraphrases",
+    "app": "intake",
+    "question": "How often is the arrival folder inspected?",
+    "expected": {
+      "doc": "runbook",
+      "section": 0
+    }
+  },
+  {
+    "split": "paraphrases",
+    "app": "intake",
+    "question": "Can a shipment file start processing on its own?",
+    "expected": {
+      "doc": "runbook",
+      "section": 0
+    }
+  },
+  {
+    "split": "paraphrases",
+    "app": "intake",
+    "question": "The morning handoff is overdue. What should I ask the sender to provide?",
+    "expected": {
+      "doc": "runbook",
+      "section": 1
+    }
+  },
+  {
+    "split": "paraphrases",
+    "app": "intake",
+    "question": "Which system reads the accepted scan records next?",
+    "expected": {
+      "doc": "runbook",
+      "section": 3
+    }
+  },
+  {
+    "split": "paraphrases",
+    "app": "ledger",
+    "question": "Two stops claim the same position on a route. How is that resolved?",
+    "expected": {
+      "doc": "runbook",
+      "section": 1
+    }
+  },
+  {
+    "split": "paraphrases",
+    "app": "ledger",
+    "question": "Who authorizes a change to an incorrect stop?",
+    "expected": {
+      "doc": "runbook",
+      "section": 3
+    }
+  },
+  {
+    "split": "paraphrases",
+    "app": "ledger",
+    "question": "Another process is still writing. Is it safe to run recovery?",
+    "expected": {
+      "doc": "runbook",
+      "section": 2
+    }
+  },
+  {
+    "split": "paraphrases",
+    "app": "ledger",
+    "question": "How frequently does the merge check for new input?",
+    "expected": {
+      "doc": "runbook",
+      "section": 0
+    }
+  },
+  {
+    "split": "paraphrases",
+    "app": "dispatch",
+    "question": "Who gives permission to publish the board by hand?",
+    "expected": {
+      "doc": "handbook",
+      "section": 0
+    }
+  },
+  {
+    "split": "paraphrases",
+    "app": "dispatch",
+    "question": "What do loading bay planners consult?",
+    "expected": {
+      "doc": "handbook",
+      "section": 1
+    }
+  },
+  {
+    "split": "paraphrases",
+    "app": "dispatch",
+    "question": "The upstream team missed the cutoff. Should yesterday’s view stay available?",
+    "expected": {
+      "doc": "runbook",
+      "section": 1
+    }
+  },
+  {
+    "split": "paraphrases",
+    "app": "dispatch",
+    "question": "How do I prevent publishing the same partition twice?",
+    "expected": {
+      "doc": "runbook",
+      "section": 2
+    }
+  },
+  {
+    "split": "paraphrases",
+    "app": "intake",
+    "question": "Can I send the manifest over SFTP instead?",
+    "expected": null
+  },
+  {
+    "split": "paraphrases",
+    "app": "ledger",
+    "question": "Who approves overtime for the routing team?",
+    "expected": null
+  },
+  {
+    "split": "paraphrases",
+    "app": "dispatch",
+    "question": "How long can I roll back to an older published snapshot?",
+    "expected": null
+  },
+  {
+    "split": "paraphrases",
+    "app": "dispatch",
+    "question": "Is dispatch data encrypted at rest?",
+    "expected": null
+  },
+  {
+    "split": "paraphrases",
+    "app": "intake",
+    "question": "How do we recover from RL 410?",
+    "expected": null
+  },
+  {
+    "split": "paraphrases",
+    "app": "dispatch",
+    "question": "What do I do for DB-411?",
+    "expected": null
+  }
+]

@@ -1,0 +1,86 @@
+[
+  {
+    "split": "evidence",
+    "app": "intake",
+    "question": "How long do we keep inbound manifests?",
+    "expected": {
+      "doc": "retention",
+      "section": 0
+    }
+  },
+  {
+    "split": "evidence",
+    "app": "intake",
+    "question": "What is the retention period for manifests?",
+    "expected": {
+      "doc": "retention",
+      "section": 0
+    }
+  },
+  {
+    "split": "evidence",
+    "app": "dispatch",
+    "question": "How long do we retain the last published snapshot?",
+    "expected": null
+  },
+  {
+    "split": "evidence",
+    "app": "intake",
+    "question": "How long are ready markers retained?",
+    "expected": null
+  },
+  {
+    "split": "evidence",
+    "app": "intake",
+    "question": "What is the retention period for the batch ledger?",
+    "expected": null
+  },
+  {
+    "split": "evidence",
+    "app": "ledger",
+    "question": "Who approves corrections to conflicting stop IDs?",
+    "expected": {
+      "doc": "runbook",
+      "section": 3
+    }
+  },
+  {
+    "split": "evidence",
+    "app": "dispatch",
+    "question": "Who authorizes manual publication?",
+    "expected": {
+      "doc": "handbook",
+      "section": 0
+    }
+  },
+  {
+    "split": "evidence",
+    "app": "dispatch",
+    "question": "Who signs off on overtime for Dispatch Operations?",
+    "expected": null
+  },
+  {
+    "split": "evidence",
+    "app": "ledger",
+    "question": "Who approves vacation for Routing Operations?",
+    "expected": null
+  },
+  {
+    "split": "evidence",
+    "app": "dispatch",
+    "question": "Who approves deletion of a published snapshot?",
+    "expected": null
+  },
+  {
+    "split": "evidence",
+    "app": "dispatch",
+    "question": "Who approves corrections to conflicting stop IDs?",
+    "expected": null
+  },
+  {
+    "split": "evidence",
+    "app": "ledger",
+    "question": "Who approves manual publication?",
+    "expected": null
+  }
+]

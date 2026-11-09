@@ -1,3 +1,5 @@
 dist/
 *.tgz
 node_modules/
+.bench/
+__pycache__/

@@ -2,6 +2,24 @@ import './build.mjs';
 const { default: worker } = await import('./dist/server/index.js');
 import test from 'node:test';
 import assert from 'node:assert/strict';
+
+test('Retention answers identify the item, period, and versioned source', async () => {
+  const html = await ask('intake', 'How long do we keep inbound manifests?');
+  assert.match(html, /retains inbound manifests for 14 days/);
+  assert.match(html, /doc=retention&v=1\.0#s0/);
+  for (const [app, question] of [
+    ['intake', 'What is the retention period for the batch ledger?'],
+    ['dispatch', 'How long is the published snapshot retained?'],
+    ['ledger', 'How long are inbound manifests retained?']
+  ]) assert.match(await ask(app, question), /INSUFFICIENT EVIDENCE/);
+});
+
+test('Approval requires a matching action in the selected application', async () => {
+  assert.match(await ask('dispatch', 'Who authorizes manual publication?'), /doc=handbook&v=1\.0#s0/);
+  for (const question of ['Who approves overtime for the routing team?', 'Who approves Route Ledger?']) {
+    assert.match(await ask('ledger', question), /INSUFFICIENT EVIDENCE/);
+  }
+});
 const get = path => worker.fetch(new Request('https://test.invalid' + path));
 const ask = (app,q) => get('/?'+ new URLSearchParams({app,q})).text();
 for(const [app,q,fragment] of [

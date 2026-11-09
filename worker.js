@@ -16,9 +16,47 @@ function terms(text) {
 const index = documents.flatMap(doc => doc.sections.map((section,i) => ({
   doc, section, i, title:terms(section.title), words:terms(section.body)
 })));
+
+const approval = /\b(?:approv(?:e[ds]?|al|ing)|authoriz(?:e[ds]?|ation)|signs? off(?: on)?|gives? permission)\b/i;
+const retention = /\b(?:retain(?:s|ed|ing)?|retention|kept|keep(?:s|ing)?)\b/i;
+const duration = /\b(?:\d+|one|two|three|four|five|six|seven|eight|nine|ten)\s+(?:hours?|days?|weeks?|months?|years?)\b/i;
+export function questionFact(query) {
+  if (approval.test(query)) return 'approval';
+  if (/\bretention\b/i.test(query) || (/\bhow (?:long|many)\b/i.test(query) &&
+      (retention.test(query) || /\broll back\b/i.test(query)))) return 'retention';
+  return null;
+}
+
+const questionWords = new Set('a an are be by can do does for from how i in is it long many may of on our period team the this to we what which who days hours weeks months years'.split(' '));
+function factTerms(text) {
+  return (text.toLowerCase().match(/[a-z0-9]+/g) || [])
+    .filter(word => !questionWords.has(word))
+    .map(word => word.replace(/s$/, ''));
+}
+
+function supportsFact(row, query, fact) {
+  const relation = fact === 'approval' ? approval : retention;
+  const requested = factTerms(query.replace(relation, ''));
+  if (!requested.length) return false;
+  return row.section.body.split(/(?<=[.!?])\s+/).some(sentence => {
+    if (!relation.test(sentence)) return false;
+    // Match the retained item before the duration, excluding incidental text
+    // such as the batch that starts the retention clock.
+    const period = fact === 'retention' && duration.exec(sentence);
+    if (fact === 'retention' && !period) return false;
+    // Ownership and approval can be separate clauses with different objects.
+    const action = relation.exec(sentence);
+    const evidence = period ? sentence.slice(0, period.index) : sentence.slice(action.index + action[0].length);
+    const words = new Set(factTerms(evidence));
+    return requested.every(word => words.has(word));
+  });
+}
+
 function retrieve(app, query) {
   const tokens = terms(query);
+  const fact = questionFact(query);
   const ranked = index.filter(row => row.doc.app === app).map(row => {
+    if (fact) return { row, score: supportsFact(row, query, fact) ? 1 : 0 };
     const matches = tokens.filter(t => row.title.includes(t) || row.words.includes(t));
     const valid = matches.length && tokens.every(t => !/[-_.\d]/.test(t) || matches.includes(t));
     const score = valid && matches.length / tokens.length >= 0.5 ?

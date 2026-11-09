@@ -1,5 +1,5 @@
 import { readdir, readFile, mkdir, writeFile } from 'node:fs/promises';
-const docs = [];
+export const docs = [];
 for (const app of await readdir('docs')) {
   for (const file of await readdir('docs/' + app)) {
     const raw = await readFile('docs/' + app + '/' + file, 'utf8');

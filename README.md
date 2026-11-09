@@ -18,7 +18,7 @@ flowchart LR
   A --> V[Versioned source viewer]
 ```
 
-The build embeds four synthetic documents with thirteen sections in a single Fetch-compatible Worker. All three pipelines are public demo scopes. Search filters the index before ranking. Title matches carry more weight than body matches. Identifier-like terms must match, and tied scores yield an abstention. The citation viewer resolves pipeline, document, version and section. All source changes require a rebuild.
+The build embeds five synthetic documents with fourteen sections in a single Fetch-compatible Worker. All three pipelines are public demo scopes. Search filters the index before ranking. Title matches carry more weight than body matches. Identifier-like terms must match, and tied scores yield an abstention. The citation viewer resolves pipeline, document, version and section. All source changes require a rebuild.
 
 An extractive baseline makes grounding inspectable and keeps query costs independent of model tokens. Lexical overlap is an approximation of relevance. Paraphrases, negation, and questions requiring several sections need separate evaluation. There is no language model or embedding service in this milestone.
 
@@ -43,6 +43,31 @@ The improvement recognizes formatting variants of runbook error codes such as `C
 Carrier Intake publishes scans to Route Ledger, which releases partitions for Dispatch Board. The board's runbook covers publication and recovery. Its handbook identifies the owner and snapshot consumers. Ask the same restart question under all three scopes or compare DB-410 under Dispatch Board with RL-410 under Route Ledger.
 
 With retrieval rules unchanged, 17 of 18 fresh cases passed (11/12 supported, 6/6 unsupported). Every tested foreign code was rejected. The missed question, “What if an upstream release misses the morning deadline?”, produced an abstention. Across all three evaluation sets, 36/38 passed. Both misses are valid questions that received no answer. A semantic retrieval comparison should target paraphrase recall while retaining the identifier and abstention checks. These results do not measure the benefit of embeddings.
+
+### Semantic fallback experiment
+
+The offline candidate keeps the production lexical answer whenever one exists. On an abstention, it embeds the question with MiniLM and searches only the selected pipeline. Queries containing digits or identifier punctuation stay on the lexical path. The candidate requires cosine similarity of at least 0.40 and a lead of at least 0.08 over the runner-up. Section vectors use the heading and body, attention-mask mean pooling, and L2 normalization.
+
+| Questions | Production lexical | Lexical with MiniLM fallback |
+| --- | ---: | ---: |
+| Earlier 38 | 36 correct, 2 abstentions on supported questions | 35 correct, 2 abstentions on supported questions, 1 wrong citation |
+| Fresh 18 | 6 correct, 11 abstentions on supported questions, 1 wrong citation | 8 correct, 9 abstentions on supported questions, 1 wrong citation |
+
+On the fresh questions, MiniLM recovered the downstream scan consumer and the active-writer recovery procedure. Across the earlier questions it introduced an unsupported answer about snapshot retention. Both methods cited operational ownership for an overtime-approval question. Keep the public retriever on its lexical baseline and test evidence sufficiency before revisiting deployment. This experiment evaluates section selection against manually labeled synthetic questions.
+
+The local CPU run made 18 fallback calls with a warm median of 24.3 ms and p95 of 43.6 ms. This measures question embedding and in-scope ranking after model loading and section indexing. Hosted endpoint latency requires separate measurement.
+
+#### Reproduce the experiment
+
+From the project root, use Node.js 22+ and a Python 3.12 virtual environment. Install the optional benchmark dependencies with `python -m pip install -r eval/requirements.txt`. Download [tokenizer.json](https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/1110a243fdf4706b3f48f1d95db1a4f5529b4d41/tokenizer.json) and [model.onnx](https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/1110a243fdf4706b3f48f1d95db1a4f5529b4d41/onnx/model.onnx) into `.bench/model/`. Run `python eval/semantic.py`. The benchmark builds and queries the production handler for its baseline, runs embeddings locally, and reports changed decisions per question. Model files and Python packages stay outside the application bundle. [MiniLM model card](https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2)
+
+### Approval and retention evidence
+
+The public retriever now checks recognized approval requests against the action in an approval clause. For retention-period requests, the section must explicitly connect the requested item with a retention expression and duration. Ambiguous matches abstain. These conservative lexical rules cover common wording; paraphrase coverage remains limited.
+
+Carrier Intake's synthetic Inbound file policy v1.0 specifies 14 days for inbound manifests after batch commitment. Dispatch Board has no documented snapshot retention period. Try both questions and follow the intake citation.
+
+On the same five-document corpus, the original lexical baseline scored 51/68, including four wrong citations. The added checks scored 55/68 with zero wrong citations and thirteen supported questions unanswered. All twelve targeted cases passed, including four valid answers and eight abstentions. The optional local semantic experiment also respects these checks and scored 57/68 with zero wrong citations. The deployed application uses the lexical implementation. Counts describe the labeled fixtures only.
 
 | Phase | Deliverable | Exit check |
 | --- | --- | --- |
