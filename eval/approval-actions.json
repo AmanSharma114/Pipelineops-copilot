@@ -1,0 +1,74 @@
+[
+  {
+    "split": "approval-actions",
+    "app": "dispatch",
+    "question": "Who signs off on publishing the board manually?",
+    "expected": {
+      "doc": "handbook",
+      "section": 0
+    }
+  },
+  {
+    "split": "approval-actions",
+    "app": "dispatch",
+    "question": "Who authorizes publication by hand?",
+    "expected": {
+      "doc": "handbook",
+      "section": 0
+    }
+  },
+  {
+    "split": "approval-actions",
+    "app": "ledger",
+    "question": "Who signs off on correcting conflicting stop IDs?",
+    "expected": {
+      "doc": "runbook",
+      "section": 3
+    }
+  },
+  {
+    "split": "approval-actions",
+    "app": "ledger",
+    "question": "Who approves a correction to a stop ID?",
+    "expected": {
+      "doc": "runbook",
+      "section": 3
+    }
+  },
+  {
+    "split": "approval-actions",
+    "app": "ledger",
+    "question": "Who approves deleting incorrect stop IDs?",
+    "expected": null
+  },
+  {
+    "split": "approval-actions",
+    "app": "dispatch",
+    "question": "Who authorizes automatic publication of the board?",
+    "expected": null
+  },
+  {
+    "split": "approval-actions",
+    "app": "dispatch",
+    "question": "Who authorizes manually publishing payroll?",
+    "expected": null
+  },
+  {
+    "split": "approval-actions",
+    "app": "intake",
+    "question": "Who approves correcting conflicting stop IDs?",
+    "expected": null
+  },
+  {
+    "split": "approval-actions",
+    "app": "ledger",
+    "question": "Who authorizes publishing the board manually?",
+    "expected": null
+  },
+  {
+    "split": "approval-actions",
+    "app": "dispatch",
+    "question": "Who approves the board?",
+    "expected": null
+  }
+]

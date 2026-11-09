@@ -102,7 +102,10 @@ test('Retention answers identify the item, period, and versioned source', async 
 });
 
 test('Approval requires a matching action in the selected application', async () => {
-  assert.match(await ask('dispatch', 'Who authorizes manual publication?'), /doc=handbook&v=1\.0#s0/);
+  assert.match(await ask('dispatch', 'Who authorizes manual publication?'), /doc=handbook&v=1\.1#s0/);
+  assert.match(await ask('dispatch', 'Who signs off on publishing the board manually?'), /Dispatch Operations owns the board/);
+  assert.match(await ask('dispatch', 'Who approves the board?'), /INSUFFICIENT EVIDENCE/);
+  assert.match(await ask('ledger', 'Who approves deleting incorrect stop IDs?'), /INSUFFICIENT EVIDENCE/);
   for (const question of ['Who approves overtime for the routing team?', 'Who approves Route Ledger?']) {
     assert.match(await ask('ledger', question), /INSUFFICIENT EVIDENCE/);
   }
@@ -229,8 +232,7 @@ test('Dispatch Board navigation, library, and suggested questions work together'
   assert.ok(home.includes('href="/?app=dispatch">Dispatch Board</a>'));
   const desk = await get('/?app=dispatch').text();
   for (const document of ['runbook', 'handbook']) {
-    const version = document === 'runbook' ? '1.1' : '1.0';
-    const path = '/source?app=dispatch&doc=' + document + '&v=' + version;
+    const path = '/source?app=dispatch&doc=' + document + '&v=1.1';
     assert.ok(desk.includes('href="' + path + '"'));
     assert.equal(get(path).status, 200);
   }

@@ -68,6 +68,13 @@ function factTerms(text) {
     .map(word => word.replace(/s$/, ''));
 }
 
+function approvalTerms(text) {
+  return factTerms(text.toLowerCase()
+    .replace(/\b(?:by hand|manually)\b/g, 'manual')
+    .replace(/\b(?:publish|publishing)\b/g, 'publication')
+    .replace(/\b(?:correcting|(?:change|changing|fix|fixing) (?:to )?(?:(?:an?|the) )?(?:incorrect|erroneous|wrong))\b/g, 'correction'));
+}
+
 function supportsFact(row, query, fact) {
   if (fact === 'deadline') {
     if (!deadline.test(row.section.body) || !/\b\d{1,2}:\d{2}\b/.test(row.section.body)) return false;
@@ -87,7 +94,8 @@ function supportsFact(row, query, fact) {
     return terms(normalized).every(term => row.title.includes(term) || row.words.includes(term));
   }
   const relation = fact === 'approval' ? approval : retention;
-  const requested = factTerms(query.replace(relation, ''));
+  const extract = fact === 'approval' ? approvalTerms : factTerms;
+  const requested = extract(query.replace(relation, ''));
   if (!requested.length) return false;
   return row.section.body.split(/(?<=[.!?])\s+/).some(sentence => {
     if (!relation.test(sentence)) return false;
@@ -98,7 +106,12 @@ function supportsFact(row, query, fact) {
     // Ownership and approval can be separate clauses with different objects.
     const action = relation.exec(sentence);
     const evidence = period ? sentence.slice(0, period.index) : sentence.slice(action.index + action[0].length);
-    const words = new Set(factTerms(evidence));
+    const words = new Set(extract(evidence));
+    if (fact === 'approval') {
+      // A match on the object alone ("the board") does not identify its approved action.
+      const actions = ['publication', 'correction'].filter(word => words.has(word));
+      if (actions.length && !actions.some(word => requested.includes(word))) return false;
+    }
     return requested.every(word => words.has(word));
   });
 }

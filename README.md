@@ -101,6 +101,10 @@ The incident lookup evaluation covers ordinary questions around an exact code, i
 
 Dispatch Board runbook v1.1 documents the upstream release boundary, the 08:05 UTC cutoff, and the snapshot to keep visible. Deadline and cutoff lookups require a time in the selected section and evidence for the requested qualifiers. Eight targeted cases passed, up from four on the prior release. Across 115 labeled questions, 105 produced the expected outcome and ten supported questions received no answer.
 
+### Approval action wording
+
+The approval-action evaluation compares manual publication and stop-ID correction with unsupported requests such as automatic publication or deleting a stop. Dispatch Board handbook v1.1 explicitly identifies the board as the object of manual publication. On ten targeted questions, the prior release scored 7/10 and this release scored 10/10. Across 125 labeled questions, 117 produced the expected citation or abstention. Eight supported questions remained unanswered.
+
 ### Build-time version synchronization
 
 The Markdown repository keeps the initial file at `docs/<pipeline>/<id>.md`. Add a revision alongside it as `<id>@<major>.<minor>.md` with a matching `Version` header. Run `npm run build` to refresh the local Worker bundle. Each build reads the repository and selects the highest numeric version per pipeline and document ID. Older text stays in the source repository. Only the current revision enters the deployed index and source viewer. A superseded citation returns HTTP 404.
