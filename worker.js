@@ -20,11 +20,31 @@ const index = documents.flatMap(doc => doc.sections.map((section,i) => ({
 const approval = /\b(?:approv(?:e[ds]?|al|ing)|authoriz(?:e[ds]?|ation)|signs? off(?: on)?|gives? permission)\b/i;
 const retention = /\b(?:retain(?:s|ed|ing)?|retention|kept|keep(?:s|ing)?)\b/i;
 const duration = /\b(?:\d+|one|two|three|four|five|six|seven|eight|nine|ten)\s+(?:hours?|days?|weeks?|months?|years?)\b/i;
+const frequencyQuestion = /\bhow (?:often|frequently)\b/i;
+const recurrence = /\b(?:(?:each|every)\s+(?:(?:\d+|one|two|three|four|five|ten|fifteen|thirty)\s+)?(?:minutes?|hours?|days?|weeks?|months?)|hourly|daily|weekly|monthly)\b/i;
 export function questionFact(query) {
   if (approval.test(query)) return 'approval';
   if (/\bretention\b/i.test(query) || (/\bhow (?:long|many)\b/i.test(query) &&
       (retention.test(query) || /\broll back\b/i.test(query)))) return 'retention';
+  if (frequencyQuestion.test(query)) return 'frequency';
   return null;
+}
+
+function frequencyMatch(row, query) {
+  const lower = query.toLowerCase();
+  const selected = apps.get(row.doc.app).toLowerCase();
+  for (const name of apps.values()) {
+    if (name.toLowerCase() !== selected && lower.includes(name.toLowerCase())) return false;
+  }
+  const subject = lower.replace(frequencyQuestion, '').replace(selected, '').replace(/\bruns?\b/g, '');
+  const requested = terms(subject);
+  // An unqualified "it" refers to the selected pipeline's documented schedule.
+  if (!requested.length && !row.title.includes('schedule')) return false;
+  return row.section.body.split(/(?<=[.!?])\s+/).some(sentence => {
+    if (!recurrence.test(sentence)) return false;
+    const evidence = terms(sentence);
+    return requested.every(term => evidence.includes(term));
+  });
 }
 
 const questionWords = new Set('a an are be by can do does for from how i in is it long many may of on our period team the this to we what which who days hours weeks months years'.split(' '));
@@ -35,6 +55,7 @@ function factTerms(text) {
 }
 
 function supportsFact(row, query, fact) {
+  if (fact === 'frequency') return frequencyMatch(row, query);
   const relation = fact === 'approval' ? approval : retention;
   const requested = factTerms(query.replace(relation, ''));
   if (!requested.length) return false;

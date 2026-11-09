@@ -1,0 +1,92 @@
+[
+  {
+    "split": "cadence",
+    "app": "intake",
+    "question": "How often does it run?",
+    "expected": {
+      "doc": "runbook",
+      "section": 0
+    }
+  },
+  {
+    "split": "cadence",
+    "app": "ledger",
+    "question": "How frequently does this pipeline run?",
+    "expected": {
+      "doc": "runbook",
+      "section": 0
+    }
+  },
+  {
+    "split": "cadence",
+    "app": "dispatch",
+    "question": "How often does Dispatch Board run?",
+    "expected": {
+      "doc": "runbook",
+      "section": 0
+    }
+  },
+  {
+    "split": "cadence",
+    "app": "intake",
+    "question": "How often does the watcher check?",
+    "expected": {
+      "doc": "runbook",
+      "section": 0
+    }
+  },
+  {
+    "split": "cadence",
+    "app": "dispatch",
+    "question": "How frequently does board_publish run?",
+    "expected": {
+      "doc": "runbook",
+      "section": 0
+    }
+  },
+  {
+    "split": "cadence",
+    "app": "ledger",
+    "question": "How often does Route Ledger poll freight.scan_events?",
+    "expected": {
+      "doc": "runbook",
+      "section": 0
+    }
+  },
+  {
+    "split": "cadence",
+    "app": "intake",
+    "question": "How often does the watcher retry failed uploads?",
+    "expected": null
+  },
+  {
+    "split": "cadence",
+    "app": "dispatch",
+    "question": "How often does route_merge run?",
+    "expected": null
+  },
+  {
+    "split": "cadence",
+    "app": "ledger",
+    "question": "How often do you rotate backups?",
+    "expected": null
+  },
+  {
+    "split": "cadence",
+    "app": "dispatch",
+    "question": "How often does Route Ledger run?",
+    "expected": null
+  },
+  {
+    "split": "cadence",
+    "app": "intake",
+    "question": "How frequently does it run on weekends?",
+    "expected": null
+  },
+  {
+    "split": "cadence",
+    "app": "dispatch",
+    "question": "How often do supervisors refresh the board manually?",
+    "expected": null
+  }
+]

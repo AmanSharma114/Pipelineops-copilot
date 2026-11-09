@@ -85,6 +85,10 @@ On the same five-document corpus, the original lexical baseline scored 51/68, in
 
 The Carrier scan data-flow specification covers staging, the CI-422 count mismatch, and duplicate scan identifiers. Seven additional citation and isolation checks passed. Across 75 labeled questions the lexical retriever produced 62 correct outcomes, with 13 supported questions unanswered.
 
+### Schedule question evaluation
+
+For “how often” and “how frequently” questions, retrieval checks for a recurring interval in the source. An unqualified question uses the selected pipeline’s schedule. Named jobs and qualifiers must match evidence in the same sentence. On twelve schedule fixtures, the lexical baseline answered one of six supported questions and declined all six unsupported ones. The added check answered all six supported cases and preserved all six abstentions. Overall, 74 of 87 labeled questions passed. The remaining thirteen supported questions received no answer.
+
 ### Build-time version synchronization
 
 The Markdown repository keeps the initial file at `docs/<pipeline>/<id>.md`. Add a revision alongside it as `<id>@<major>.<minor>.md` with a matching `Version` header. Run `npm run build` to refresh the local Worker bundle. Each build reads the repository and selects the highest numeric version per pipeline and document ID. Older text stays in the source repository. Only the current revision enters the deployed index and source viewer. A superseded citation returns HTTP 404.

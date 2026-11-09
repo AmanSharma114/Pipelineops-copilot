@@ -125,6 +125,14 @@ test('Index status reflects deployed versions and links only within its pipeline
   assert.equal(get('/index-status?app=unknown').status, 404);
 });
 const ask = (app,q) => get('/?'+ new URLSearchParams({app,q})).text();
+test('Unqualified frequency questions resolve to the selected pipeline schedule', async () => {
+  for (const [app, cadence] of [['intake','every five minutes'], ['ledger','15 and 45 minutes past each hour'], ['dispatch','five minutes past each hour']]) {
+    const html = await ask(app, 'How often does it run?');
+    assert.ok(html.includes(cadence));
+    assert.match(html, /doc=runbook&v=[\d.]+#s0/);
+  }
+  assert.match(await ask('dispatch', 'How often does it run during outages?'), /INSUFFICIENT EVIDENCE/);
+});
 test('Citation round trip restores the question, pipeline and answer anchor', async () => {
   const question = 'CI-204? & "CI-204" #CI-204';
   const html = await ask('intake', question);
