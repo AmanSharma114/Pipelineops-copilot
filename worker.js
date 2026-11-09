@@ -71,8 +71,51 @@ function esc(value) {
 function href(app,doc) {
   return '/source?app='+encodeURIComponent(app)+'&doc='+encodeURIComponent(doc.id)+'&v='+encodeURIComponent(doc.version);
 }
+const pipelineRoles = {
+  intake: 'Validate carrier scans',
+  ledger: 'Reconcile route stops',
+  dispatch: 'Publish loading plans'
+};
+
+function pipelineMap(active) {
+  return `<nav class="flow" aria-label="Select a pipeline">
+    <div class="flow-label">Freight data flow</div>
+    <div class="stations">${[...apps].map(([id, name]) => `<div class="station">
+      <a aria-current="${id === active ? 'page' : 'false'}" href="/?app=${id}">${name}</a>
+      <small>${pipelineRoles[id]}</small></div>`).join('')}</div>
+  </nav>`;
+}
+
+function sourceLibrary(app, scoped) {
+  return `<aside><div class="panel-title"><h2>Source library</h2><small>${scoped.length} ${scoped.length === 1 ? 'document' : 'documents'}</small></div>
+    ${scoped.map(doc => `<details class="document"><summary><span>${esc(doc.title)}</span><small>v${doc.version}</small></summary>
+      <ol>${doc.sections.map((section,i) => `<li><a href="${href(app, doc)}#s${i}">${esc(section.title)}</a></li>`).join('')}</ol></details>
+      <a class="open-doc" href="${href(app,doc)}">Read document ↗</a>`).join('')}
+  </aside>`;
+}
+
+function supportDesk(app, scoped, q, hit) {
+  const examples = [
+    ['Schedule', 'What triggers this pipeline?'],
+    ['Recovery', 'How do I restart safely?']
+  ];
+  const incident = scoped.flatMap(doc => doc.sections).map(section => section.title.match(/^([A-Z]+-\d+) (.+)$/)).find(Boolean);
+  const askLink = question => '/?app=' + app + '&amp;q=' + encodeURIComponent(question);
+  const start = incident && !q ? `<div class="incident"><div><small>Sample incident</small>
+    <h2><code>${incident[1]}</code> ${esc(incident[2])}</h2></div><a href="${askLink('What does ' + incident[1] + ' mean?')}">Investigate <span aria-hidden="true">→</span></a></div>` : '';
+  const answer = q ? `<section class="answer"><small>${hit ? 'SOURCE EXCERPT' : 'INSUFFICIENT EVIDENCE'}</small>
+    <h2>${hit ? esc(hit.section.title) : 'No confident match'}</h2><p>${hit ? esc(hit.section.body) : 'Try a specific error code or check the source library for this pipeline.'}</p>${hit ? `<a href="${href(app,hit.doc)}#s${hit.i}">${esc(hit.doc.title)} · v${hit.doc.version} · ${esc(hit.section.title)} ↗</a>` : ''}</section>` : '';
+  return `<div class="overview"><div><small class="eyebrow">Freight operations</small><h1>Pipeline support desk</h1>
+    <p>Trace an incident from error code to recovery procedure.</p></div>${pipelineMap(app)}</div>
+    <div class="layout"><div class="workspace"><h2 class="pipeline-name">${apps.get(app)}</h2>${start}
+    <form action="/" method="get"><input type="hidden" name="app" value="${app}"><label for="q">Ask about ${apps.get(app)}</label>
+    <div class="compose"><input id="q" name="q" maxlength="320" required placeholder="Enter a question or error code…" value="${esc(q)}"><button>Ask ↗</button></div>
+    <div class="examples">${examples.map(([label,s]) => `<a title="${s}" href="${askLink(s)}">${label} ↗</a>`).join('')}</div></form>${answer}</div>
+    ${sourceLibrary(app,scoped)}</div>`;
+}
+
 function page(main) {
-  return new Response(`<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>PipelineOps Copilot</title><style>${css}</style><header><div class="brand"><b>⌁</b> PipelineOps <small>/ Copilot</small></div><span class="status">Synthetic workspace</span></header><main>${main}</main></html>`,{headers:{'content-type':'text/html; charset=utf-8','content-security-policy':"default-src 'none'; style-src 'unsafe-inline'; form-action 'self'; base-uri 'none'; frame-ancestors 'none'",'x-content-type-options':'nosniff'}});
+  return new Response(`<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>PipelineOps Copilot</title><style>${css}</style><header><a class="brand" href="/"><b aria-hidden="true">⌁</b> PipelineOps <small>Copilot</small></a><div class="header-links"><span class="status">Synthetic demo</span><a href="https://github.com/AmanSharma114/Pipelineops-copilot">GitHub ↗</a></div></header><main>${main}</main></html>`,{headers:{'content-type':'text/html; charset=utf-8','content-security-policy':"default-src 'none'; style-src 'unsafe-inline'; form-action 'self'; base-uri 'none'; frame-ancestors 'none'",'x-content-type-options':'nosniff'}});
 }
 export default { fetch(request) {
   if(request.method !== 'GET') return new Response('Read only',{status:405,headers:{Allow:'GET'}});
@@ -89,8 +132,5 @@ export default { fetch(request) {
   const q = (p.get('q') || '').trim();
   if(q.length > 320) return new Response('Question exceeds 320 characters',{status:400});
   const hit = q && retrieve(app,q);
-  const samples = ['What triggers this pipeline?', 'How do I restart safely?'];
-  const incident = scoped.flatMap(doc => doc.sections).map(section => section.title.match(/\b[A-Z]{2,}-\d+\b/)).find(Boolean);
-  if (incident) samples.push('What does ' + incident[0] + ' mean?');
-  return page(`<nav aria-label="Pipeline">${[...apps].map(([id,name])=>`<a aria-current="${app===id?'page':'false'}" href="/?app=${id}">${name}</a>`).join('')}</nav><div class="layout"><div><small class="kicker">PIPELINE SUPPORT DESK</small><h1>${apps.get(app)}</h1><p>Ask about schedules, recovery steps, or an error code.</p><form action="/" method="get"><input type="hidden" name="app" value="${app}"><label for="q">Your question</label><div class="compose"><input id="q" name="q" maxlength="320" required placeholder="Ask about ${apps.get(app)}…" value="${esc(q)}"><button>Ask ↗</button></div></form>${q?`<section class="answer"><small>${hit?'SOURCE EXCERPT':'INSUFFICIENT EVIDENCE'}</small><h2>${hit?esc(hit.section.title):'No confident match'}</h2><p>${hit?esc(hit.section.body):'Try a specific error code or open the runbook to check its coverage.'}</p>${hit?`<a href="${href(app,hit.doc)}#s${hit.i}">${esc(hit.doc.title)} · v${hit.doc.version} · ${esc(hit.section.title)} ↗</a>`:''}</section>`:''}<h2>Try a question</h2><div class="examples">${samples.map(s=>`<a href="/?app=${app}&amp;q=${encodeURIComponent(s)}">${s} <span>↗</span></a>`).join('')}</div></div><aside><small>SOURCE LIBRARY</small>${scoped.map(d=>`<h2><a href="${href(app,d)}">${esc(d.title)} ↗</a></h2><p>Version ${d.version} · ${d.sections.length} sections</p><ol>${d.sections.map((s,i)=>`<li><a href="${href(app,d)}#s${i}">${esc(s.title)}</a></li>`).join('')}</ol>`).join('')}</aside></div>`);
+  return page(supportDesk(app, scoped, q, hit));
 }};

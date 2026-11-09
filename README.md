@@ -1,6 +1,18 @@
 # PipelineOps Copilot
 
-A read-only support desk for a fictional freight platform. Ask a question about Carrier Intake, Route Ledger, or Dispatch Board and follow the cited excerpt to the versioned runbook section.
+**[Open the live support desk](https://pipelineops-freight-copilot.aamansharmamu114.chatgpt.site/)**
+
+Aman Sharma built this independent portfolio demo around a support engineer's everyday question: when a pipeline fails, which recovery procedure applies? The desk searches the selected freight pipeline's documentation and cites the exact section and version. All operational data is synthetic.
+
+![Carrier Intake showing the CI-204 recovery procedure and its versioned runbook citation](assets/support-desk.png)
+
+## Try a one-minute investigation
+
+1. Open [Carrier Intake's CI-204 incident](https://pipelineops-freight-copilot.aamansharmamu114.chatgpt.site/?app=intake&q=CI-204). The runbook explains why the missing ready marker matters and what the engineer should ask the carrier to resend.
+2. Follow the citation beneath the excerpt. The source viewer highlights the matching section of runbook v1.2.
+3. Try [the same error code under Route Ledger](https://pipelineops-freight-copilot.aamansharmamu114.chatgpt.site/?app=ledger&q=CI-204). The backend searches only that pipeline and reports insufficient evidence.
+
+The public retriever returned the expected section or abstention on 55 of 68 labeled questions. It missed 13 supported questions and produced zero wrong citations on that set. The evaluation below includes the offline embedding comparison and the reasons for keeping the public baseline.
 
 ## Run locally
 

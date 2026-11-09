@@ -1,2 +1,70 @@
-*{box-sizing:border-box}html{color-scheme:dark}body{margin:0;background:#0c1018;color:#eef1f7;font:16px/1.6 Inter,"Segoe UI",sans-serif}header,main{max-width:1160px;margin:auto;padding:24px 5vw}header{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #293242;gap:15px}.brand{font-size:21px;font-weight:680;letter-spacing:-.04em}.brand b{background:#4269ed;color:white;border-radius:8px;padding:1px 10px}.brand small,p{color:#adb9cb}.status{color:#bedf88;font-size:13px}.status:before{content:'●';margin-right:8px}nav{display:flex;gap:6px;margin:8px 0 50px}nav a{padding:7px 16px;border-radius:6px}nav [aria-current=page]{background:#20345d;color:#d5e3ff}.layout{display:grid;grid-template-columns:minmax(0,2fr) minmax(215px,1fr);gap:36px}h1{font-size:clamp(36px,5vw,60px);line-height:1.08;letter-spacing:-.055em;margin:12px 0}h2{font-size:19px;line-height:1.35}small,.kicker{font-size:12px}.kicker,aside>small,.answer>small{letter-spacing:.12em;font-weight:700;color:#acc2f8}a{color:#b6ccff;text-decoration:none}a:hover{text-decoration:underline}form,aside,.answer,article{background:#131b27;border:1px solid #303b4d;border-radius:12px;padding:22px}aside{align-self:start}aside ol{padding-left:22px}aside li{margin:12px 0;color:#8496af}form,.answer{margin:24px 0}label{display:block;font-weight:600;margin-bottom:10px}.compose{display:flex;gap:8px}input,button{font:inherit;padding:10px;border-radius:7px}input{width:100%;min-width:0;border:1px solid #45526a;background:#0b111c;color:white}button{background:#4269ed;color:white;border:0;padding-inline:18px;cursor:pointer;white-space:nowrap}.examples a{display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid #283243}.examples span{color:#8295af}article{max-width:800px;margin:24px auto}article section{padding:8px 15px;border-left:3px solid transparent}article section:target{border-color:#bcdf85;background:#1b2830}a:focus-visible,input:focus-visible,button:focus-visible{outline:3px solid #b6df89;outline-offset:3px}@media(max-width:740px){.layout{grid-template-columns:1fr}nav{margin-bottom:28px}.brand{font-size:18px}.status{font-size:11px}}
-nav{flex-wrap:wrap}
+* { box-sizing: border-box }
+:root { color-scheme: dark; --ink: #f1f4f8; --muted: #a7b4c5; --line: #303d50; --blue: #a9c7ff; --lime: #c1ed8b }
+body { margin: 0; background: #0d121a; color: var(--ink); font: 16px/1.55 Inter, "Segoe UI", sans-serif }
+header, main { width: min(1340px, 100%); padding-inline: clamp(20px, 5vw, 72px); margin: auto }
+header { height: 76px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--line) }
+a { color: var(--blue); text-decoration: none }
+a:hover { text-decoration: underline }
+.brand, .header-links { display: flex; align-items: center; gap: 10px }
+.brand { color: var(--ink); font-weight: 700; font-size: 21px; letter-spacing: -.04em }
+.brand b { display: grid; place-items: center; background: #a9c7ff; color: #162846; width: 35px; height: 35px; border-radius: 9px; font-size: 30px; line-height: 1 }
+.brand small { font-weight: 400; color: var(--muted); font-size: 19px }
+.header-links { gap: 24px; font-size: 14px }
+.status { font-size: 12px; color: #c2cebd; display: flex; gap: 8px; align-items: center }
+.status:before { content: ''; width: 7px; height: 7px; background: var(--lime); border-radius: 50% }
+main { padding-block: 36px 64px }
+.overview { padding: clamp(20px,3vw,40px); background: linear-gradient(110deg,#192e51,#17253a 61%,#15202e); border: 1px solid #364865; border-radius: 18px; display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: center }
+.eyebrow, .flow-label, .answer>small, article>small { font: 650 12px/1.4 "Segoe UI", sans-serif; letter-spacing: .1em; text-transform: uppercase; color: #b4ccf4 }
+h1,h2,p { margin: 0 }
+h1 { font-size: clamp(34px,4.2vw,58px); line-height: 1.08; letter-spacing: -.055em; font-weight: 650; margin: 9px 0 12px }
+p, .station small { color: var(--muted) }
+.flow { background-color: #101b2b; background-image: radial-gradient(#334257 1px, transparent 1px); background-size: 15px 15px; border: 1px solid #34465f; border-radius: 12px; padding: 16px 18px 20px }
+.flow-label { color: #acbdd4; font-size: 10px }
+.stations { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); margin-top: 15px }
+.station { min-width: 0; position: relative }
+.station:not(:last-child):before { content: ''; position: absolute; top: 6px; left: 6px; width: 100%; height: 2px; background: #526783 }
+.station a { display: block; position: relative; color: #d4deeb; font-weight: 650; font-size: 14px; padding-top: 22px }
+.station a:before { content: ''; position: absolute; top: 1px; left: 0; width: 9px; height: 9px; background: #152338; border: 2px solid #8394aa; border-radius: 50% }
+.station [aria-current=page] { color: var(--lime) }
+.station [aria-current=page]:before { background: var(--lime); border-color: var(--lime); box-shadow: 0 0 0 4px #c1ed8b22 }
+.station small { font-size: 12px; display: block }
+.layout { margin-top: 26px; display: grid; grid-template-columns: minmax(0,1.8fr) minmax(260px,1fr); gap: 22px; align-items: start }
+.workspace, aside, article { background: #161e2a; border: 1px solid var(--line); border-radius: 14px; padding: clamp(19px,2.1vw,30px) }
+h2 { font-size: 19px; line-height: 1.35 }
+.pipeline-name { font-size: 29px; font-weight: 620; letter-spacing: -.04em; margin-bottom: 20px }
+.incident { display: flex; justify-content: space-between; align-items: center; gap: 12px; background: #1b2b40; border-left: 3px solid #91b7ff; padding: 13px 15px; border-radius: 0 8px 8px 0; margin-bottom: 22px }
+.incident small { font-size: 12px; color: #b7c8df }
+.incident h2 { font-size: 16px; margin-top: 3px }
+code { color: #c4daff; font-size: .95em }
+.incident a,.examples a,.open-doc { font-size: 13px; font-weight: 600 }
+label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 8px }
+.compose { display: flex; gap: 7px }
+input,button { border-radius: 7px; font: inherit; padding: 11px 13px }
+input { width: 100%; min-width: 0; background: #0f1620; color: var(--ink); border: 1px solid #526174 }
+input::placeholder { color: #929faf }
+button { border: 0; background: #abcaff; color: #0c203e; font-weight: 700; cursor: pointer; white-space: nowrap }
+button:hover { background: #c9dcff }
+.examples { margin-top: 12px; display: flex; gap: 10px }
+.examples a { border: 1px solid #415168; padding: 3px 10px; border-radius: 20px }
+.panel-title { display: flex; justify-content: space-between; align-items: baseline; gap: 6px }
+.panel-title small,summary small { color: var(--muted); font: 12px/1.5 ui-monospace,monospace }
+.document { margin-top: 18px; border-top: 1px solid var(--line); padding-top: 13px }
+summary { cursor: pointer; font-size: 15px; font-weight: 600 }
+summary::marker { color: #829fc2 }
+summary small { margin-left: 6px }
+.open-doc { display: inline-block; padding-block: 5px }
+ol { padding-left: 22px; color: var(--muted) }
+li { margin-block: 6px }
+.answer { padding-top: 22px; border-top: 1px solid var(--line); margin-top: 24px }
+.answer>small { color: var(--lime) }
+.answer h2,article h2 { margin: 8px 0 }
+.answer p, article p { color: #d2dce7; line-height: 1.72 }
+.answer>a { display: inline-block; margin-top: 15px; font-size: 14px }
+article { max-width: 850px; margin: 20px auto }
+article section { border-left: 3px solid transparent; padding: 12px 16px; scroll-margin-top: 18px }
+article section:target { background: #202d32; border-color: var(--lime) }
+a:focus-visible,button:focus-visible,input:focus-visible,summary:focus-visible { outline: 3px solid var(--lime); outline-offset: 3px }
+@media (max-width: 900px) { .overview { grid-template-columns: 1fr; gap: 20px } }
+@media (max-width: 720px) { .layout { grid-template-columns: 1fr } header { height: 62px } main { padding-block: 20px 40px } .header-links { gap: 12px } .brand { gap: 6px; font-size: 17px } .brand small { font-size: 15px } }
+@media (max-width: 480px) { .header-links { gap: 8px; font-size: 12px } .status { font-size: 10px } .flow { padding-inline: 10px } .station a { font-size: 12px } .station small { font-size: 11px } .overview { padding: 16px } .incident { flex-wrap: wrap } }
+
