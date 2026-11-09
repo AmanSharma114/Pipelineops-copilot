@@ -93,6 +93,10 @@ For “how often” and “how frequently” questions, retrieval checks for a r
 
 The writer-recovery evaluation covers concurrent writes, foreign job identifiers, forced restarts, and writer termination. The lexical baseline scored 6/10 on these questions. Requiring evidence for the requested action raised the result to 10/10 and recovered one earlier paraphrase. Across 97 labeled questions, 85 produced the expected result and 12 supported questions received no answer.
 
+### Conversational incident lookup
+
+The incident lookup evaluation covers ordinary questions around an exact code, including “Any guidance for RL‑410?”. Lookup framing is removed only when one code remains. On ten targeted questions, retrieval improved from 5/10 to 10/10. Across 107 labeled questions, 96 produced the expected citation or abstention and eleven supported questions received no answer.
+
 ### Build-time version synchronization
 
 The Markdown repository keeps the initial file at `docs/<pipeline>/<id>.md`. Add a revision alongside it as `<id>@<major>.<minor>.md` with a matching `Version` header. Run `npm run build` to refresh the local Worker bundle. Each build reads the repository and selects the highest numeric version per pipeline and document ID. Older text stays in the source repository. Only the current revision enters the deployed index and source viewer. A superseded citation returns HTTP 404.

@@ -1,0 +1,77 @@
+[
+  {
+    "split": "code-lookup",
+    "app": "ledger",
+    "question": "Could you explain error code RL410?",
+    "expected": {
+      "doc": "runbook",
+      "section": 1
+    }
+  },
+  {
+    "split": "code-lookup",
+    "app": "intake",
+    "question": "Please walk me through incident CI 422.",
+    "expected": {
+      "doc": "validation",
+      "section": 1
+    }
+  },
+  {
+    "split": "code-lookup",
+    "app": "dispatch",
+    "question": "Do you have guidance on DB–410?",
+    "expected": {
+      "doc": "runbook",
+      "section": 1
+    }
+  },
+  {
+    "split": "code-lookup",
+    "app": "intake",
+    "question": "What does error code ci204 mean?",
+    "expected": {
+      "doc": "runbook",
+      "section": 1
+    }
+  },
+  {
+    "split": "code-lookup",
+    "app": "ledger",
+    "question": "Any details about RL‑410, please?",
+    "expected": {
+      "doc": "runbook",
+      "section": 1
+    }
+  },
+  {
+    "split": "code-lookup",
+    "app": "dispatch",
+    "question": "Could you explain error code RL410?",
+    "expected": null
+  },
+  {
+    "split": "code-lookup",
+    "app": "intake",
+    "question": "Any guidance for CI-423?",
+    "expected": null
+  },
+  {
+    "split": "code-lookup",
+    "app": "dispatch",
+    "question": "Please walk me through incident DH-118.",
+    "expected": null
+  },
+  {
+    "split": "code-lookup",
+    "app": "ledger",
+    "question": "Could you explain RL410 and DB410?",
+    "expected": null
+  },
+  {
+    "split": "code-lookup",
+    "app": "ledger",
+    "question": "Any guidance for RL410 payroll deductions?",
+    "expected": null
+  }
+]

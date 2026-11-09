@@ -17,6 +17,16 @@ const index = documents.flatMap(doc => doc.sections.map((section,i) => ({
   doc, section, i, title:terms(section.title), words:terms(section.body)
 })));
 
+// Ignore conversational framing only for a lookup of one incident code.
+// Operational qualifiers and additional identifiers still affect retrieval.
+const lookupFraming = new Set(terms('please could would you explain walk through error code incident any guidance details information about have help with look up meaning'));
+function retrievalTerms(query) {
+  const tokens = terms(query);
+  const subject = tokens.filter(token => !lookupFraming.has(token));
+  if (subject.length === 1 && /^[a-z]+-\d+$/.test(subject[0])) return subject;
+  return tokens;
+}
+
 const approval = /\b(?:approv(?:e[ds]?|al|ing)|authoriz(?:e[ds]?|ation)|signs? off(?: on)?|gives? permission)\b/i;
 const retention = /\b(?:retain(?:s|ed|ing)?|retention|kept|keep(?:s|ing)?)\b/i;
 const duration = /\b(?:\d+|one|two|three|four|five|six|seven|eight|nine|ten)\s+(?:hours?|days?|weeks?|months?|years?)\b/i;
@@ -85,7 +95,7 @@ function supportsFact(row, query, fact) {
 }
 
 function retrieve(app, query) {
-  const tokens = terms(query);
+  const tokens = retrievalTerms(query);
   const fact = questionFact(query);
   const ranked = index.filter(row => row.doc.app === app).map(row => {
     if (fact) return { row, score: supportsFact(row, query, fact) ? 1 : 0 };

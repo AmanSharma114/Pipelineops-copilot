@@ -125,6 +125,13 @@ test('Index status reflects deployed versions and links only within its pipeline
   assert.equal(get('/index-status?app=unknown').status, 404);
 });
 const ask = (app,q) => get('/?'+ new URLSearchParams({app,q})).text();
+test('Conversational incident lookups preserve code identity and scope', async () => {
+  assert.match(await ask('ledger','Any guidance for rl—410?'), /doc=runbook&v=2\.1#s1/);
+  assert.match(await ask('intake','Please explain error code CI422'), /doc=validation&v=1\.0#s1/);
+  for (const question of ['Any guidance for CI422?', 'Any details about RL-411?', 'Please explain RL410 and DB410']) {
+    assert.match(await ask('ledger',question), /INSUFFICIENT EVIDENCE/);
+  }
+});
 test('Writer recovery requires documented instructions for the requested operation', async () => {
   const answer = await ask('ledger', 'Another process is still writing. Is it safe to run recovery?');
   assert.match(answer, /wait for any active writer to finish/);
