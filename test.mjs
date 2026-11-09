@@ -37,6 +37,30 @@ test('Sync replaces a version, replays identically and preserves the worker on i
   await writeFile(join(intake, 'retention@2.0.md'), update);
   assert.throws(build);
   assert.equal(await readFile(artifact, 'utf8'), snapshot);
+  await writeFile(join(intake, 'retention@2.0.md'), '# Inbound file policy\nVersion 2.0\nStatus retired\n');
+  build();
+  assert.match(await answer(3), /INSUFFICIENT EVIDENCE/);
+  const withdrawn = await readFile(artifact, 'utf8');
+  assert.ok(!withdrawn.includes('retains inbound manifests'));
+  build();
+  assert.equal(await readFile(artifact, 'utf8'), withdrawn);
+});
+
+test('Retired evidence is absent from search and its known citations explain withdrawal', async () => {
+  const desk = await get('/?app=dispatch').text();
+  assert.ok(desk.includes('Retired document'));
+  assert.ok(!desk.includes('legacy dispatch register'));
+  assert.match(await ask('dispatch', 'What does DH-118 mean?'), /INSUFFICIENT EVIDENCE/);
+  for (const version of ['1.0', '1.1']) {
+    const response = get('/source?app=dispatch&doc=handoff&v=' + version);
+    assert.equal(response.status, 410);
+    const notice = await response.text();
+    assert.ok(notice.includes('Retired at v1.1'));
+    assert.ok(notice.includes('View current Dispatch Board sources'));
+    assert.ok(!notice.includes('legacy dispatch register'));
+  }
+  assert.equal(get('/source?app=intake&doc=handoff&v=1.0').status, 404);
+  assert.equal(get('/source?app=dispatch&doc=handoff&v=9.9').status, 404);
 });
 
 test('Retention answers identify the item, period, and versioned source', async () => {

@@ -4,8 +4,9 @@ import { join } from 'node:path';
 function parseRevision(app, filename, raw) {
   const name = /^([a-z0-9-]+)(?:@([\d.]+))?\.md$/.exec(filename);
   const [header, ...parts] = raw.trim().split(/^## /m);
-  const metadata = /^# ([^\r\n]+)\r?\nVersion ((?:0|[1-9]\d*)\.(?:0|[1-9]\d*))\s*$/.exec(header);
-  if (!name || !metadata || !parts.length || (name[2] && name[2] !== metadata[2])) {
+  const metadata = /^# ([^\r\n]+)\r?\nVersion ((?:0|[1-9]\d*)\.(?:0|[1-9]\d*))(?:\r?\nStatus (retired))?\s*$/.exec(header);
+  const retired = metadata?.[3] === 'retired';
+  if (!name || !metadata || (retired ? parts.length > 0 : parts.length === 0) || (name[2] && name[2] !== metadata[2])) {
     throw Error('Invalid document revision: ' + app + '/' + filename);
   }
   const sections = parts.map(part => {
@@ -14,7 +15,7 @@ function parseRevision(app, filename, raw) {
     if (!title.trim() || !body) throw Error('Empty section in ' + filename);
     return { title: title.trim(), body };
   });
-  return { app, id: name[1], title: metadata[1], version: metadata[2], sections };
+  return { app, id: name[1], title: metadata[1], version: metadata[2], sections, retired };
 }
 
 function newestFirst(left, right) {
@@ -43,6 +44,9 @@ export async function readCurrentDocuments(root) {
   return [...groups.values()].map(revisions => {
     revisions.sort(newestFirst);
     const [current, previous] = revisions;
+    if (current.retired) {
+      return { ...current, versions: revisions.map(revision => revision.version) };
+    }
     return previous ? { ...current, supersedes: previous.version } : current;
   });
 }

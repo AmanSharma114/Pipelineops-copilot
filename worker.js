@@ -87,10 +87,12 @@ function pipelineMap(active) {
 }
 
 function sourceLibrary(app, scoped) {
+  const retired = withdrawals.filter(doc => doc.app === app);
   return `<aside><div class="panel-title"><h2>Source library</h2><small>${scoped.length} ${scoped.length === 1 ? 'document' : 'documents'}</small></div>
     ${scoped.map(doc => `<details class="document"><summary><span>${esc(doc.title)}</span><small>v${doc.version}</small></summary>
       <ol>${doc.sections.map((section,i) => `<li><a href="${href(app, doc)}#s${i}">${esc(section.title)}</a></li>`).join('')}</ol></details>
       <a class="open-doc" href="${href(app,doc)}">Read document ↗</a>`).join('')}
+    ${retired.map(doc => `<div class="withdrawal"><small>Retired document</small><a href="${href(app,doc)}">${esc(doc.title)} ↗</a></div>`).join('')}
   </aside>`;
 }
 
@@ -114,8 +116,8 @@ function supportDesk(app, scoped, q, hit) {
     ${sourceLibrary(app,scoped)}</div>`;
 }
 
-function page(main) {
-  return new Response(`<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>PipelineOps Copilot</title><style>${css}</style><header><a class="brand" href="/"><b aria-hidden="true">⌁</b> PipelineOps <small>Copilot</small></a><div class="header-links"><span class="status">Synthetic demo</span><a href="https://github.com/AmanSharma114/Pipelineops-copilot">GitHub ↗</a></div></header><main>${main}</main></html>`,{headers:{'content-type':'text/html; charset=utf-8','content-security-policy':"default-src 'none'; style-src 'unsafe-inline'; form-action 'self'; base-uri 'none'; frame-ancestors 'none'",'x-content-type-options':'nosniff'}});
+function page(main, status = 200) {
+  return new Response(`<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>PipelineOps Copilot</title><style>${css}</style><header><a class="brand" href="/"><b aria-hidden="true">⌁</b> PipelineOps <small>Copilot</small></a><div class="header-links"><span class="status">Synthetic demo</span><a href="https://github.com/AmanSharma114/Pipelineops-copilot">GitHub ↗</a></div></header><main>${main}</main></html>`,{status,headers:{'content-type':'text/html; charset=utf-8','content-security-policy':"default-src 'none'; style-src 'unsafe-inline'; form-action 'self'; base-uri 'none'; frame-ancestors 'none'",'x-content-type-options':'nosniff'}});
 }
 export default { fetch(request) {
   if(request.method !== 'GET') return new Response('Read only',{status:405,headers:{Allow:'GET'}});
@@ -124,6 +126,10 @@ export default { fetch(request) {
   if (!apps.has(app)) return new Response('Unknown pipeline',{status:404});
   const scoped = documents.filter(doc => doc.app === app);
   if (pathname === '/source') {
+    const retired = withdrawals.find(d => d.app === app && d.id === p.get('doc') && d.versions.includes(p.get('v')));
+    if (retired) return page(`<article><small>${apps.get(app)} · Retired at v${retired.version}</small>
+      <h1>${esc(retired.title)}</h1><p>This guide was withdrawn. Its passages have been removed from support search.</p>
+      <a href="/?app=${app}">View current ${apps.get(app)} sources →</a></article>`, 410);
     const doc = scoped.find(d => d.id === p.get('doc') && d.version === p.get('v'));
     if (!doc) return new Response('Source unavailable',{status:404});
     return page(`<a href="/?app=${app}">← Support desk</a><article><small>${apps.get(app)} / v${doc.version}${doc.supersedes ? ` · Supersedes v${doc.supersedes}` : ''}</small><h1>${esc(doc.title)}</h1>${doc.sections.map((s,i)=>`<section id="s${i}"><h2>${esc(s.title)}</h2><p>${esc(s.body)}</p></section>`).join('')}</article>`);

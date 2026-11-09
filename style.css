@@ -53,6 +53,8 @@ summary { cursor: pointer; font-size: 15px; font-weight: 600 }
 summary::marker { color: #829fc2 }
 summary small { margin-left: 6px }
 .open-doc { display: inline-block; padding-block: 5px }
+.withdrawal { border-top: 1px solid var(--line); margin-top: 16px; padding-top: 14px }
+.withdrawal small { display: block; color: var(--muted); font-size: 12px }
 ol { padding-left: 22px; color: var(--muted) }
 li { margin-block: 6px }
 .answer { padding-top: 22px; border-top: 1px solid var(--line); margin-top: 24px }
