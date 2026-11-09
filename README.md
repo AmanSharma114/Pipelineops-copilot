@@ -91,6 +91,8 @@ Each build scans and hashes the Markdown source files. It reuses previously pars
 
 ### Follow a withdrawn citation
 
+Open **View index status** from a pipeline's source library to inspect deployed document versions, searchable section counts, and withdrawals. Each document link opens the current source or the retirement notice. [Dispatch Board index status](https://pipelineops-freight-copilot.aamansharmamu114.chatgpt.site/index-status?app=dispatch)
+
 The synthetic Dispatch Board repository includes a retired manual handoff guide. Open its [former citation](https://pipelineops-freight-copilot.aamansharmamu114.chatgpt.site/source?app=dispatch&doc=handoff&v=1.0) to see the withdrawal notice and a link to current sources. [Search for its former error code](https://pipelineops-freight-copilot.aamansharmamu114.chatgpt.site/?app=dispatch&q=DH-118) to verify the old procedure is unavailable.
 
 To retire a document, add a higher revision with the same ID. Include the title and version header, followed by `Status retired` on its own line, and omit all sections. At build time the highest revision wins. Retirement publishes only identifying metadata, excludes all historical text from retrieval, and returns HTTP 410 for known revisions in that pipeline. Unknown versions and other pipeline scopes return 404.

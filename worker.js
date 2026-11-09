@@ -93,7 +93,24 @@ function sourceLibrary(app, scoped) {
       <ol>${doc.sections.map((section,i) => `<li><a href="${href(app, doc)}#s${i}">${esc(section.title)}</a></li>`).join('')}</ol></details>
       <a class="open-doc" href="${href(app,doc)}">Read document ↗</a>`).join('')}
     ${retired.map(doc => `<div class="withdrawal"><small>Retired document</small><a href="${href(app,doc)}">${esc(doc.title)} ↗</a></div>`).join('')}
+    <a class="index-link" href="/index-status?app=${app}">View index status →</a>
   </aside>`;
+}
+
+function indexStatus(app, current) {
+  const retired = withdrawals.filter(doc => doc.app === app);
+  const sections = current.reduce((count, doc) => count + doc.sections.length, 0);
+  const counts = [[current.length, 'Searchable documents'], [sections, 'Indexed sections'], [retired.length, 'Retired documents']];
+  const rows = [...current, ...retired].map(doc => {
+    const detail = doc.retired ? 'Withdrawn at v' + doc.version :
+      'Current v' + doc.version + (doc.supersedes ? ' · Replaces v' + doc.supersedes : '');
+    return `<li><a href="${href(app, doc)}">${esc(doc.title)}</a><small>${esc(detail)}</small></li>`;
+  });
+  return `<a href="/?app=${app}">← ${apps.get(app)} support desk</a>
+    <article class="index-status"><small>${apps.get(app)}</small><h1>Index status</h1>
+    <p>Document versions included in this deployment.</p>
+    <dl>${counts.map(([count, label]) => `<div><dt>${label}</dt><dd>${count}</dd></div>`).join('')}</dl>
+    <h2>Document versions</h2><ul>${rows.join('')}</ul></article>`;
 }
 
 function supportDesk(app, scoped, q, hit) {
@@ -125,6 +142,7 @@ export default { fetch(request) {
   const app = p.get('app') ?? 'intake';
   if (!apps.has(app)) return new Response('Unknown pipeline',{status:404});
   const scoped = documents.filter(doc => doc.app === app);
+  if (pathname === '/index-status') return page(indexStatus(app, scoped));
   if (pathname === '/source') {
     const retired = withdrawals.find(d => d.app === app && d.id === p.get('doc') && d.versions.includes(p.get('v')));
     if (retired) return page(`<article><small>${apps.get(app)} · Retired at v${retired.version}</small>

@@ -108,6 +108,22 @@ test('Approval requires a matching action in the selected application', async ()
   }
 });
 const get = path => worker.fetch(new Request('https://test.invalid' + path));
+test('Index status reflects deployed versions and links only within its pipeline', async () => {
+  for (const [app, counts] of [['dispatch', [2,5,1]], ['intake', [2,5,0]], ['ledger', [1,4,0]]]) {
+    const path = '/index-status?app=' + app;
+    assert.ok((await get('/?app=' + app).text()).includes('href="' + path + '"'));
+    const html = await get(path).text();
+    assert.deepEqual([...html.matchAll(/<dd>(\d+)<\/dd>/g)].map(match => Number(match[1])), counts);
+    const links = [...html.matchAll(/href="(\/source\?[^"]+)"/g)].map(match => match[1]);
+    assert.equal(links.length, counts[0] + counts[2]);
+    for (const link of links) {
+      assert.equal(new URL(link, 'https://test.invalid').searchParams.get('app'), app);
+      assert.equal(get(link).status, link.includes('doc=handoff') ? 410 : 200);
+    }
+    if (app === 'intake') assert.ok(html.includes('Current v1.1 · Replaces v1.0'));
+  }
+  assert.equal(get('/index-status?app=unknown').status, 404);
+});
 const ask = (app,q) => get('/?'+ new URLSearchParams({app,q})).text();
 for(const [app,q,fragment] of [
   ['intake','What triggers this pipeline?',0],['ledger','What triggers this pipeline?',0],
