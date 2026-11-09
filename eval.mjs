@@ -2,9 +2,12 @@ import './build.mjs';
 import { readFile } from 'node:fs/promises';
 
 const { default: worker } = await import('./dist/server/index.js');
-const cases = JSON.parse(await readFile(new URL('./eval/cases.json', import.meta.url)));
+const cases = [];
+for (const file of ['cases.json', 'three-pipeline.json']) {
+  cases.push(...JSON.parse(await readFile(new URL('./eval/' + file, import.meta.url))));
+}
 let failures = 0;
-for (const split of ['dev', 'holdout']) {
+for (const split of new Set(cases.map(item => item.split))) {
   let correct = 0;
   let abstentions = 0;
   let unsupported = 0;

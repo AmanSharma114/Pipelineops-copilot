@@ -1,6 +1,6 @@
 # PipelineOps Copilot
 
-A read-only support desk for a fictional freight platform. Ask a question about Carrier Intake or Route Ledger and follow the cited excerpt to the versioned runbook section.
+A read-only support desk for a fictional freight platform. Ask a question about Carrier Intake, Route Ledger, or Dispatch Board and follow the cited excerpt to the versioned runbook section.
 
 ## Run locally
 
@@ -18,7 +18,7 @@ flowchart LR
   A --> V[Versioned source viewer]
 ```
 
-The build embeds two synthetic documents with eight sections in a single Fetch-compatible Worker. Both pipelines are public demo scopes. Search filters the index before ranking. Title matches carry more weight than body matches. Identifier-like terms must match, and tied scores yield an abstention. The citation viewer resolves pipeline, document, version and section. All source changes require a rebuild.
+The build embeds four synthetic documents with thirteen sections in a single Fetch-compatible Worker. All three pipelines are public demo scopes. Search filters the index before ranking. Title matches carry more weight than body matches. Identifier-like terms must match, and tied scores yield an abstention. The citation viewer resolves pipeline, document, version and section. All source changes require a rebuild.
 
 An extractive baseline makes grounding inspectable and keeps query costs independent of model tokens. Lexical overlap is an approximation of relevance. Paraphrases, negation, and questions requiring several sections need separate evaluation. There is no language model or embedding service in this milestone.
 
@@ -37,6 +37,12 @@ Run `node eval.mjs` from this directory. The evaluation exercises the built requ
 | Unsupported questions across both sets | 6/6 abstentions | 6/6 abstentions |
 
 The improvement recognizes formatting variants of runbook error codes such as `CI 204` and `ci204`. The numeric suffix must match in full. The remaining held-out miss is “Any guidance for rl—410?” under Route Ledger. The code normalizes correctly, but surrounding words lower the lexical coverage below the answer threshold. These small synthetic sets characterize this release. Future tuning needs fresh held-out questions.
+
+### Three-pipeline evaluation
+
+Carrier Intake publishes scans to Route Ledger, which releases partitions for Dispatch Board. The board's runbook covers publication and recovery. Its handbook identifies the owner and snapshot consumers. Ask the same restart question under all three scopes or compare DB-410 under Dispatch Board with RL-410 under Route Ledger.
+
+With retrieval rules unchanged, 17 of 18 fresh cases passed (11/12 supported, 6/6 unsupported). Every tested foreign code was rejected. The missed question, “What if an upstream release misses the morning deadline?”, produced an abstention. Across all three evaluation sets, 36/38 passed. Both misses are valid questions that received no answer. A semantic retrieval comparison should target paraphrase recall while retaining the identifier and abstention checks. These results do not measure the benefit of embeddings.
 
 | Phase | Deliverable | Exit check |
 | --- | --- | --- |

@@ -1,0 +1,146 @@
+[
+  {
+    "split": "three-pipeline",
+    "app": "intake",
+    "question": "What is the safe restart procedure?",
+    "expected": {
+      "doc": "runbook",
+      "section": 2
+    }
+  },
+  {
+    "split": "three-pipeline",
+    "app": "intake",
+    "question": "What is the trigger schedule?",
+    "expected": {
+      "doc": "runbook",
+      "section": 0
+    }
+  },
+  {
+    "split": "three-pipeline",
+    "app": "ledger",
+    "question": "What is the safe restart procedure?",
+    "expected": {
+      "doc": "runbook",
+      "section": 2
+    }
+  },
+  {
+    "split": "three-pipeline",
+    "app": "ledger",
+    "question": "What is the trigger schedule?",
+    "expected": {
+      "doc": "runbook",
+      "section": 0
+    }
+  },
+  {
+    "split": "three-pipeline",
+    "app": "dispatch",
+    "question": "What is the safe restart procedure?",
+    "expected": {
+      "doc": "runbook",
+      "section": 2
+    }
+  },
+  {
+    "split": "three-pipeline",
+    "app": "dispatch",
+    "question": "What is the trigger schedule?",
+    "expected": {
+      "doc": "runbook",
+      "section": 0
+    }
+  },
+  {
+    "split": "three-pipeline",
+    "app": "dispatch",
+    "question": "Who approves manual publication?",
+    "expected": {
+      "doc": "handbook",
+      "section": 0
+    }
+  },
+  {
+    "split": "three-pipeline",
+    "app": "dispatch",
+    "question": "Who uses the dispatch console?",
+    "expected": {
+      "doc": "handbook",
+      "section": 1
+    }
+  },
+  {
+    "split": "three-pipeline",
+    "app": "dispatch",
+    "question": "Where do supervisors get the latest stop for each route?",
+    "expected": {
+      "doc": "handbook",
+      "section": 1
+    }
+  },
+  {
+    "split": "three-pipeline",
+    "app": "dispatch",
+    "question": "What does db410 mean?",
+    "expected": {
+      "doc": "runbook",
+      "section": 1
+    }
+  },
+  {
+    "split": "three-pipeline",
+    "app": "ledger",
+    "question": "What does rl410 mean?",
+    "expected": {
+      "doc": "runbook",
+      "section": 1
+    }
+  },
+  {
+    "split": "three-pipeline",
+    "app": "dispatch",
+    "question": "RL 410",
+    "expected": null
+  },
+  {
+    "split": "three-pipeline",
+    "app": "ledger",
+    "question": "DB 410",
+    "expected": null
+  },
+  {
+    "split": "three-pipeline",
+    "app": "intake",
+    "question": "DB410",
+    "expected": null
+  },
+  {
+    "split": "three-pipeline",
+    "app": "dispatch",
+    "question": "CI204",
+    "expected": null
+  },
+  {
+    "split": "three-pipeline",
+    "app": "dispatch",
+    "question": "When does the night shift start?",
+    "expected": null
+  },
+  {
+    "split": "three-pipeline",
+    "app": "dispatch",
+    "question": "How long are snapshots retained?",
+    "expected": null
+  },
+  {
+    "split": "three-pipeline",
+    "app": "dispatch",
+    "question": "What if an upstream release misses the morning deadline?",
+    "expected": {
+      "doc": "runbook",
+      "section": 1
+    }
+  }
+]

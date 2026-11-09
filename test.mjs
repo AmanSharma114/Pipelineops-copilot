@@ -39,3 +39,28 @@ test('Near matches and mixed codes cannot select a known incident', async () => 
     assert.match(await ask('intake', query), /INSUFFICIENT EVIDENCE/);
   }
 });
+
+test('Dispatch Board navigation, library, and suggested questions work together', async () => {
+  const home = await get('/').text();
+  assert.ok(home.includes('href="/?app=dispatch">Dispatch Board</a>'));
+  const desk = await get('/?app=dispatch').text();
+  for (const document of ['runbook', 'handbook']) {
+    const path = '/source?app=dispatch&doc=' + document + '&v=1.0';
+    assert.ok(desk.includes('href="' + path + '"'));
+    assert.equal(get(path).status, 200);
+  }
+  const examples = [...desk.matchAll(/href="(\/\?app=dispatch&amp;q=[^"]+)"/g)];
+  assert.equal(examples.length, 3);
+  for (const [, link] of examples) {
+    const response = await get(link.replace('&amp;', '&')).text();
+    assert.match(response, /class="answer"><small>SOURCE EXCERPT/);
+  }
+});
+
+test('Shared incident suffixes retain their pipeline namespace', async () => {
+  assert.match(await ask('dispatch','DB410'), /doc=runbook&v=1\.0#s1/);
+  assert.match(await ask('ledger','RL410'), /doc=runbook&v=2\.1#s1/);
+  for (const [app, code] of [['ledger','DB410'], ['intake','DB410'], ['dispatch','RL410']]) {
+    assert.match(await ask(app, code), /INSUFFICIENT EVIDENCE/);
+  }
+});
