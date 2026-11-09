@@ -125,6 +125,13 @@ test('Index status reflects deployed versions and links only within its pipeline
   assert.equal(get('/index-status?app=unknown').status, 404);
 });
 const ask = (app,q) => get('/?'+ new URLSearchParams({app,q})).text();
+test('Deadline lookup cites a timed procedure and respects unsupported qualifiers', async () => {
+  const html = await ask('dispatch','What time is the upstream release deadline?');
+  assert.match(html, /08:05 UTC/);
+  assert.match(html, /doc=runbook&v=1\.1#s1/);
+  assert.match(await ask('dispatch','What time is the weekend release deadline?'), /INSUFFICIENT EVIDENCE/);
+  assert.match(await ask('ledger','What is the upstream release cutoff?'), /INSUFFICIENT EVIDENCE/);
+});
 test('Conversational incident lookups preserve code identity and scope', async () => {
   assert.match(await ask('ledger','Any guidance for rl—410?'), /doc=runbook&v=2\.1#s1/);
   assert.match(await ask('intake','Please explain error code CI422'), /doc=validation&v=1\.0#s1/);
@@ -222,7 +229,8 @@ test('Dispatch Board navigation, library, and suggested questions work together'
   assert.ok(home.includes('href="/?app=dispatch">Dispatch Board</a>'));
   const desk = await get('/?app=dispatch').text();
   for (const document of ['runbook', 'handbook']) {
-    const path = '/source?app=dispatch&doc=' + document + '&v=1.0';
+    const version = document === 'runbook' ? '1.1' : '1.0';
+    const path = '/source?app=dispatch&doc=' + document + '&v=' + version;
     assert.ok(desk.includes('href="' + path + '"'));
     assert.equal(get(path).status, 200);
   }
@@ -235,7 +243,7 @@ test('Dispatch Board navigation, library, and suggested questions work together'
 });
 
 test('Shared incident suffixes retain their pipeline namespace', async () => {
-  assert.match(await ask('dispatch','DB410'), /doc=runbook&v=1\.0#s1/);
+  assert.match(await ask('dispatch','DB410'), /doc=runbook&v=1\.1#s1/);
   assert.match(await ask('ledger','RL410'), /doc=runbook&v=2\.1#s1/);
   for (const [app, code] of [['ledger','DB410'], ['intake','DB410'], ['dispatch','RL410']]) {
     assert.match(await ask(app, code), /INSUFFICIENT EVIDENCE/);

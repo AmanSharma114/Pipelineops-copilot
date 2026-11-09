@@ -1,0 +1,62 @@
+[
+  {
+    "split": "deadlines",
+    "app": "dispatch",
+    "question": "What if the upstream partition misses the morning cutoff?",
+    "expected": {
+      "doc": "runbook",
+      "section": 1
+    }
+  },
+  {
+    "split": "deadlines",
+    "app": "dispatch",
+    "question": "What remains visible if the morning release is late?",
+    "expected": {
+      "doc": "runbook",
+      "section": 1
+    }
+  },
+  {
+    "split": "deadlines",
+    "app": "dispatch",
+    "question": "When is the upstream release deadline?",
+    "expected": {
+      "doc": "runbook",
+      "section": 1
+    }
+  },
+  {
+    "split": "deadlines",
+    "app": "intake",
+    "question": "What is the deadline for the ready marker?",
+    "expected": {
+      "doc": "runbook",
+      "section": 1
+    }
+  },
+  {
+    "split": "deadlines",
+    "app": "dispatch",
+    "question": "What is the payroll release deadline?",
+    "expected": null
+  },
+  {
+    "split": "deadlines",
+    "app": "dispatch",
+    "question": "What is the weekend cutoff?",
+    "expected": null
+  },
+  {
+    "split": "deadlines",
+    "app": "ledger",
+    "question": "What is the morning release deadline?",
+    "expected": null
+  },
+  {
+    "split": "deadlines",
+    "app": "intake",
+    "question": "What is the DB-410 delivery deadline?",
+    "expected": null
+  }
+]

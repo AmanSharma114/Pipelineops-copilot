@@ -97,6 +97,10 @@ The writer-recovery evaluation covers concurrent writes, foreign job identifiers
 
 The incident lookup evaluation covers ordinary questions around an exact code, including “Any guidance for RL‑410?”. Lookup framing is removed only when one code remains. On ten targeted questions, retrieval improved from 5/10 to 10/10. Across 107 labeled questions, 96 produced the expected citation or abstention and eleven supported questions received no answer.
 
+### Delivery deadlines
+
+Dispatch Board runbook v1.1 documents the upstream release boundary, the 08:05 UTC cutoff, and the snapshot to keep visible. Deadline and cutoff lookups require a time in the selected section and evidence for the requested qualifiers. Eight targeted cases passed, up from four on the prior release. Across 115 labeled questions, 105 produced the expected outcome and ten supported questions received no answer.
+
 ### Build-time version synchronization
 
 The Markdown repository keeps the initial file at `docs/<pipeline>/<id>.md`. Add a revision alongside it as `<id>@<major>.<minor>.md` with a matching `Version` header. Run `npm run build` to refresh the local Worker bundle. Each build reads the repository and selects the highest numeric version per pipeline and document ID. Older text stays in the source repository. Only the current revision enters the deployed index and source viewer. A superseded citation returns HTTP 404.

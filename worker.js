@@ -33,12 +33,14 @@ const duration = /\b(?:\d+|one|two|three|four|five|six|seven|eight|nine|ten)\s+(
 const frequencyQuestion = /\bhow (?:often|frequently)\b/i;
 const recurrence = /\b(?:(?:each|every)\s+(?:(?:\d+|one|two|three|four|five|ten|fifteen|thirty)\s+)?(?:minutes?|hours?|days?|weeks?|months?)|hourly|daily|weekly|monthly)\b/i;
 const writerLanguage = /\b(?:writers?|writing)\b/i;
+const deadline = /\b(?:deadline|cutoff)\b/i;
 export function questionFact(query) {
   if (approval.test(query)) return 'approval';
   if (/\bretention\b/i.test(query) || (/\bhow (?:long|many)\b/i.test(query) &&
       (retention.test(query) || /\broll back\b/i.test(query)))) return 'retention';
   if (frequencyQuestion.test(query)) return 'frequency';
   if (writerLanguage.test(query)) return 'writer';
+  if (deadline.test(query)) return 'deadline';
   return null;
 }
 
@@ -67,6 +69,13 @@ function factTerms(text) {
 }
 
 function supportsFact(row, query, fact) {
+  if (fact === 'deadline') {
+    if (!deadline.test(row.section.body) || !/\b\d{1,2}:\d{2}\b/.test(row.section.body)) return false;
+    const normalized = text => terms(text.replace(/\b(?:deadline|cutoff)\b/gi, 'cutoff')
+      .replace(/\bmiss(?:es|ed|ing)?\b/gi, 'miss'));
+    const evidence = normalized(row.section.title + ' ' + row.section.body);
+    return normalized(query.replace(/^what time\b/i, '')).every(term => evidence.includes(term));
+  }
   if (fact === 'frequency') return frequencyMatch(row, query);
   if (fact === 'writer') {
     // Require the condition and the requested operation in the same section.
