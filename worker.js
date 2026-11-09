@@ -1,7 +1,16 @@
 const apps = new Map([['intake','Carrier Intake'],['ledger','Route Ledger']]);
+// Only fold numeric suffixes for namespaces actually used by the runbooks.
+// This keeps ordinary phrases such as "at 15" and dotted job names intact.
+const namespaces = new Set(documents.flatMap(doc => doc.sections.flatMap(section =>
+  [...(section.title + ' ' + section.body).matchAll(/\b([A-Z]{2,})-\d+\b/g)].map(match => match[1])
+)));
+const codePattern = namespaces.size
+  ? new RegExp('(?<![\\w.-])(' + [...namespaces].join('|') + ')[ \\t]*(?:[-_‐‑‒–—−][ \\t]*)?(\\d+)(?![\\w-]|\\.\\w)', 'gi')
+  : null;
 const stop = new Set('a an the do does did i is are was how what which when who my it if and of for on in at or to can should this pipeline job safely me tell means mean happens we'.split(' '));
 function terms(text) {
-  return [...new Set((text.toLowerCase().match(/[a-z0-9]+(?:[-_.][a-z0-9]+)*/g) || [])
+  const normalized = codePattern ? text.replace(codePattern, '$1-$2') : text;
+  return [...new Set((normalized.toLowerCase().match(/[a-z0-9]+(?:[-_.][a-z0-9]+)*/g) || [])
     .filter(t => !stop.has(t)).map(t => t.replace(/(?:ers|es|s)$/, end => end === 'ers' ? 'er' : '')))];
 }
 const index = documents.flatMap(doc => doc.sections.map((section,i) => ({

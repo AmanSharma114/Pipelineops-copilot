@@ -26,6 +26,18 @@ Try “What triggers this pipeline?” under both pipelines. Then search for CI-
 
 ## Prioritized roadmap
 
+### Retrieval evaluation checkpoint
+
+Run `node eval.mjs` from this directory. The evaluation exercises the built request handler and resolves each returned citation against the source viewer. Positive cases require the expected pipeline, document, section, and verbatim excerpt. Negative cases require an explicit abstention. A nonzero exit reports at least one unmet expectation.
+
+| Fixed question set | Original MVP | Code normalization |
+| --- | --- | --- |
+| Development questions | 5/8 | 8/8 |
+| Held-out questions | 9/12 | 11/12 |
+| Unsupported questions across both sets | 6/6 abstentions | 6/6 abstentions |
+
+The improvement recognizes formatting variants of runbook error codes such as `CI 204` and `ci204`. The numeric suffix must match in full. The remaining held-out miss is “Any guidance for rl—410?” under Route Ledger. The code normalizes correctly, but surrounding words lower the lexical coverage below the answer threshold. These small synthetic sets characterize this release. Future tuning needs fresh held-out questions.
+
 | Phase | Deliverable | Exit check |
 | --- | --- | --- |
 | 1. Source-backed lookup | Server-scoped search, abstention, linked viewer | Every positive fixture opens the exact quoted passage. Foreign-code and unknown-scope fixtures pass. |

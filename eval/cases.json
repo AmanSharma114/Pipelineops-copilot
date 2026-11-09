@@ -1,0 +1,164 @@
+[
+  {
+    "split": "dev",
+    "app": "intake",
+    "question": "What does CI 204 mean?",
+    "expected": {
+      "doc": "runbook",
+      "section": 1
+    }
+  },
+  {
+    "split": "dev",
+    "app": "ledger",
+    "question": "rl410",
+    "expected": {
+      "doc": "runbook",
+      "section": 1
+    }
+  },
+  {
+    "split": "dev",
+    "app": "intake",
+    "question": "CI–204",
+    "expected": {
+      "doc": "runbook",
+      "section": 1
+    }
+  },
+  {
+    "split": "dev",
+    "app": "ledger",
+    "question": "CI 204",
+    "expected": null
+  },
+  {
+    "split": "dev",
+    "app": "intake",
+    "question": "Do I have to pause the watcher before replay?",
+    "expected": {
+      "doc": "runbook",
+      "section": 2
+    }
+  },
+  {
+    "split": "dev",
+    "app": "ledger",
+    "question": "Which team approves corrections?",
+    "expected": {
+      "doc": "runbook",
+      "section": 3
+    }
+  },
+  {
+    "split": "dev",
+    "app": "ledger",
+    "question": "How much does route_merge cost?",
+    "expected": null
+  },
+  {
+    "split": "dev",
+    "app": "intake",
+    "question": "Where are validated scans published?",
+    "expected": {
+      "doc": "runbook",
+      "section": 3
+    }
+  },
+  {
+    "split": "holdout",
+    "app": "ledger",
+    "question": "Any guidance for rl—410?",
+    "expected": {
+      "doc": "runbook",
+      "section": 1
+    }
+  },
+  {
+    "split": "holdout",
+    "app": "intake",
+    "question": "ci204",
+    "expected": {
+      "doc": "runbook",
+      "section": 1
+    }
+  },
+  {
+    "split": "holdout",
+    "app": "ledger",
+    "question": "RL _ 410",
+    "expected": {
+      "doc": "runbook",
+      "section": 1
+    }
+  },
+  {
+    "split": "holdout",
+    "app": "intake",
+    "question": "What does RL410 mean?",
+    "expected": null
+  },
+  {
+    "split": "holdout",
+    "app": "ledger",
+    "question": "RL-411 duplicate sequence",
+    "expected": null
+  },
+  {
+    "split": "holdout",
+    "app": "intake",
+    "question": "CI-2040",
+    "expected": null
+  },
+  {
+    "split": "holdout",
+    "app": "intake",
+    "question": "Which table receives validated scans?",
+    "expected": {
+      "doc": "runbook",
+      "section": 3
+    }
+  },
+  {
+    "split": "holdout",
+    "app": "ledger",
+    "question": "What if route_merge has an active writer?",
+    "expected": {
+      "doc": "runbook",
+      "section": 2
+    }
+  },
+  {
+    "split": "holdout",
+    "app": "intake",
+    "question": "Who sets the price for freight?",
+    "expected": null
+  },
+  {
+    "split": "holdout",
+    "app": "ledger",
+    "question": "When does it poll freight.scan_events?",
+    "expected": {
+      "doc": "runbook",
+      "section": 0
+    }
+  },
+  {
+    "split": "holdout",
+    "app": "ledger",
+    "question": "Who handles upstream manifest delivery?",
+    "expected": {
+      "doc": "runbook",
+      "section": 3
+    }
+  },
+  {
+    "split": "holdout",
+    "app": "intake",
+    "question": "When is the delivery deadline?",
+    "expected": {
+      "doc": "runbook",
+      "section": 1
+    }
+  }
+]

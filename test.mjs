@@ -26,3 +26,16 @@ test('Reject invalid scope, version, oversized input and writes',()=>{
   assert.equal(get('/?q='+'a'.repeat(321)).status,400);
   assert.equal(worker.fetch(new Request('https://test.invalid/',{method:'POST'})).status,405);
 });
+
+test('Code variants resolve only within the owning pipeline', async () => {
+  for (const code of ['ci204', 'CI 204', 'CI‑204', 'ci _ 204']) {
+    assert.match(await ask('intake', code), /v=1\.2#s1/);
+    assert.match(await ask('ledger', code), /INSUFFICIENT EVIDENCE/);
+  }
+});
+
+test('Near matches and mixed codes cannot select a known incident', async () => {
+  for (const query of ['CI2040', 'CI204A', 'CI 204 and RL410', 'CI204.unknown']) {
+    assert.match(await ask('intake', query), /INSUFFICIENT EVIDENCE/);
+  }
+});
