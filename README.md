@@ -30,7 +30,7 @@ flowchart LR
   A --> V[Versioned source viewer]
 ```
 
-The build embeds five synthetic documents with fourteen sections in a single Fetch-compatible Worker. All three pipelines are public demo scopes. Search filters the index before ranking. Title matches carry more weight than body matches. Identifier-like terms must match, and tied scores yield an abstention. The citation viewer resolves pipeline, document, version and section. All source changes require a rebuild.
+The build embeds six searchable synthetic documents with seventeen sections in a single Fetch-compatible Worker. All three pipelines are public demo scopes. Search filters the index before ranking. Title matches carry more weight than body matches. Identifier-like terms must match, and tied scores yield an abstention. The citation viewer resolves pipeline, document, version and section. All source changes require a rebuild.
 
 An extractive baseline makes grounding inspectable and keeps query costs independent of model tokens. Lexical overlap is an approximation of relevance. Paraphrases, negation, and questions requiring several sections need separate evaluation. There is no language model or embedding service in this milestone.
 
@@ -80,6 +80,10 @@ The public retriever now checks recognized approval requests against the action 
 The original Carrier Intake policy specified 14 days for inbound manifests. Revision 1.1 extends retention to 21 days after batch commitment. Dispatch Board has no documented snapshot retention period. Try both questions and follow the intake citation.
 
 On the same five-document corpus, the original lexical baseline scored 51/68, including four wrong citations. The added checks scored 55/68 with zero wrong citations and thirteen supported questions unanswered. All twelve targeted cases passed, including four valid answers and eight abstentions. The optional local semantic experiment also respects these checks and scored 57/68 with zero wrong citations. The deployed application uses the lexical implementation. Counts describe the labeled fixtures only.
+
+### Carrier Intake validation coverage
+
+The Carrier scan data-flow specification covers staging, the CI-422 count mismatch, and duplicate scan identifiers. Seven additional citation and isolation checks passed. Across 75 labeled questions the lexical retriever produced 62 correct outcomes, with 13 supported questions unanswered.
 
 ### Build-time version synchronization
 

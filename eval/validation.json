@@ -1,0 +1,9 @@
+[
+  {"split":"validation","app":"intake","question":"What does ci422 mean?","expected":{"doc":"validation","section":1}},
+  {"split":"validation","app":"intake","question":"Where is the rejection report for CI-422?","expected":{"doc":"validation","section":1}},
+  {"split":"validation","app":"intake","question":"Which staging table does carrier_load read scan files into?","expected":{"doc":"validation","section":0}},
+  {"split":"validation","app":"intake","question":"What happens when a scan_id repeats?","expected":{"doc":"validation","section":2}},
+  {"split":"validation","app":"ledger","question":"CI-422","expected":null},
+  {"split":"validation","app":"dispatch","question":"What does CI 422 mean?","expected":null},
+  {"split":"validation","app":"intake","question":"CI-423 row count mismatch","expected":null}
+]

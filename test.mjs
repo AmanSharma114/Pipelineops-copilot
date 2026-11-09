@@ -109,7 +109,7 @@ test('Approval requires a matching action in the selected application', async ()
 });
 const get = path => worker.fetch(new Request('https://test.invalid' + path));
 test('Index status reflects deployed versions and links only within its pipeline', async () => {
-  for (const [app, counts] of [['dispatch', [2,5,1]], ['intake', [2,5,0]], ['ledger', [1,4,0]]]) {
+  for (const [app, counts] of [['dispatch', [2,5,1]], ['intake', [3,8,0]], ['ledger', [1,4,0]]]) {
     const path = '/index-status?app=' + app;
     assert.ok((await get('/?app=' + app).text()).includes('href="' + path + '"'));
     const html = await get(path).text();

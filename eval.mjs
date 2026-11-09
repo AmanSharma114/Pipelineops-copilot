@@ -3,7 +3,7 @@ import { readFile } from 'node:fs/promises';
 
 const { default: worker } = await import('./dist/server/index.js');
 const cases = [];
-for (const file of ['cases.json', 'three-pipeline.json', 'paraphrases.json', 'evidence.json']) {
+for (const file of ['cases.json', 'three-pipeline.json', 'paraphrases.json', 'evidence.json', 'validation.json']) {
   cases.push(...JSON.parse(await readFile(new URL('./eval/' + file, import.meta.url))));
 }
 let failures = 0;

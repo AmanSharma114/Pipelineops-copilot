@@ -3,7 +3,7 @@ import { docs } from '../build.mjs';
 import { readFile } from 'node:fs/promises';
 const { default: worker, questionFact } = await import('../dist/server/index.js');
 const questions = [];
-for (const file of ['cases.json', 'three-pipeline.json', 'paraphrases.json', 'evidence.json']) {
+for (const file of ['cases.json', 'three-pipeline.json', 'paraphrases.json', 'evidence.json', 'validation.json']) {
   const rows = JSON.parse(await readFile(new URL(file, import.meta.url)));
   for (const row of rows) {
     const url = new URL('https://benchmark.invalid/');
