@@ -1,4 +1,5 @@
 dist/
+.sync-cache/
 *.tgz
 node_modules/
 .bench/

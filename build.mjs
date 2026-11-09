@@ -1,8 +1,12 @@
 import { readFile, mkdir, writeFile, rename, rm } from 'node:fs/promises';
 import { randomUUID } from 'node:crypto';
+import { pathToFileURL } from 'node:url';
 import { readCurrentDocuments } from './sync.mjs';
 
-const catalog = await readCurrentDocuments('docs');
+const {documents: catalog, parsed, reused} = await readCurrentDocuments('docs', '.sync-cache');
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  console.log(`Document revisions: ${parsed} parsed, ${reused} reused`);
+}
 export const docs = catalog.filter(doc => !doc.retired);
 const withdrawals = catalog.filter(doc => doc.retired);
 const source = await readFile('worker.js','utf8');

@@ -7,6 +7,33 @@ import { cp, mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
+import { readCurrentDocuments } from './sync.mjs';
+
+test('Incremental parsing handles warm replay, same-size edits, deletion and damaged cache', async t => {
+  const root = await mkdtemp(join(tmpdir(), 'pipelineops-cache-'));
+  t.after(() => rm(root, {recursive: true, force: true}));
+  const folder = join(root, 'docs/intake');
+  const cache = join(root, 'cache');
+  await mkdir(folder, {recursive: true});
+  const run = () => readCurrentDocuments(join(root, 'docs'), cache);
+  const policy = join(folder, 'retention.md');
+  const original = await readFile('docs/intake/retention.md', 'utf8');
+  await writeFile(policy, original);
+  await cp('docs/intake/runbook.md', join(folder, 'runbook.md'));
+  assert.equal((await run()).parsed, 2);
+  assert.equal((await run()).reused, 2);
+  await writeFile(policy, original.replace('14 days', '28 days'));
+  const edited = await run();
+  assert.equal(edited.parsed, 1);
+  assert.equal(edited.reused, 1);
+  assert.match(edited.documents.find(doc => doc.id === 'retention').sections[0].body, /28 days/);
+  await rm(policy);
+  const removed = await run();
+  assert.deepEqual(removed.documents.map(doc => doc.id), ['runbook']);
+  assert.equal(removed.parsed, 0);
+  await writeFile(join(cache, 'revisions.json'), '{broken');
+  assert.equal((await run()).parsed, 1);
+});
 
 test('Sync replaces a version, replays identically and preserves the worker on ingest failure', async t => {
   const root = await mkdtemp(join(tmpdir(), 'pipelineops-sync-'));

@@ -87,6 +87,8 @@ The Markdown repository keeps the initial file at `docs/<pipeline>/<id>.md`. Add
 
 The build validates all revisions before replacing the Worker bundle with a same-directory rename. The synchronization regression exercises an update, repeat build, malformed revision, and withdrawal against a temporary repository. Publishing still requires a release.
 
+Each build scans and hashes the Markdown source files. It reuses previously parsed sections when the source path, content hash, and parser fingerprint match. Run `npm run build` twice to see parsed and reused counts. Deleted files drop out of the next catalog. The ignored local `.sync-cache/` directory stores parsed revisions and can be removed for a cold build. Deployment still builds a complete Worker bundle and initializes the live search index from current sections.
+
 ### Follow a withdrawn citation
 
 The synthetic Dispatch Board repository includes a retired manual handoff guide. Open its [former citation](https://pipelineops-freight-copilot.aamansharmamu114.chatgpt.site/source?app=dispatch&doc=handoff&v=1.0) to see the withdrawal notice and a link to current sources. [Search for its former error code](https://pipelineops-freight-copilot.aamansharmamu114.chatgpt.site/?app=dispatch&q=DH-118) to verify the old procedure is unavailable.
