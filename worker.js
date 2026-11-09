@@ -68,8 +68,12 @@ function retrieve(app, query) {
 function esc(value) {
   return String(value).replace(/[&<>"']/g,c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
-function href(app,doc) {
-  return '/source?app='+encodeURIComponent(app)+'&doc='+encodeURIComponent(doc.id)+'&v='+encodeURIComponent(doc.version);
+function href(app, doc, question) {
+  const params = new URLSearchParams({app});
+  if (question) params.set('q', question);
+  params.set('doc', doc.id);
+  params.set('v', doc.version);
+  return '/source?' + params;
 }
 const pipelineRoles = {
   intake: 'Validate carrier scans',
@@ -123,7 +127,7 @@ function supportDesk(app, scoped, q, hit) {
   const start = incident && !q ? `<div class="incident"><div><small>Sample incident</small>
     <h2><code>${incident[1]}</code> ${esc(incident[2])}</h2></div><a href="${askLink('What does ' + incident[1] + ' mean?')}">Investigate <span aria-hidden="true">→</span></a></div>` : '';
   const answer = q ? `<section class="answer"><small>${hit ? 'SOURCE EXCERPT' : 'INSUFFICIENT EVIDENCE'}</small>
-    <h2>${hit ? esc(hit.section.title) : 'No confident match'}</h2><p>${hit ? esc(hit.section.body) : 'Try a specific error code or check the source library for this pipeline.'}</p>${hit ? `<a href="${href(app,hit.doc)}#s${hit.i}">${esc(hit.doc.title)} · v${hit.doc.version} · ${esc(hit.section.title)} ↗</a>` : ''}</section>` : '';
+    <h2 id="answer">${hit ? esc(hit.section.title) : 'No confident match'}</h2><p>${hit ? esc(hit.section.body) : 'Try a specific error code or check the source library for this pipeline.'}</p>${hit ? `<a href="${href(app,hit.doc,q)}#s${hit.i}">${esc(hit.doc.title)} · v${hit.doc.version} · ${esc(hit.section.title)} ↗</a>` : ''}</section>` : '';
   return `<div class="overview"><div><small class="eyebrow">Freight operations</small><h1>Pipeline support desk</h1>
     <p>Trace an incident from error code to recovery procedure.</p></div>${pipelineMap(app)}</div>
     <div class="layout"><div class="workspace"><h2 class="pipeline-name">${apps.get(app)}</h2>${start}
@@ -150,7 +154,11 @@ export default { fetch(request) {
       <a href="/?app=${app}">View current ${apps.get(app)} sources →</a></article>`, 410);
     const doc = scoped.find(d => d.id === p.get('doc') && d.version === p.get('v'));
     if (!doc) return new Response('Source unavailable',{status:404});
-    return page(`<a href="/?app=${app}">← Support desk</a><article><small>${apps.get(app)} / v${doc.version}${doc.supersedes ? ` · Supersedes v${doc.supersedes}` : ''}</small><h1>${esc(doc.title)}</h1>${doc.sections.map((s,i)=>`<section id="s${i}"><h2>${esc(s.title)}</h2><p>${esc(s.body)}</p></section>`).join('')}</article>`);
+    const question = (p.get('q') || '').trim();
+    const back = question && question.length <= 320
+      ? `<a href="/?${new URLSearchParams({app, q:question})}#answer">← Back to answer</a>`
+      : `<a href="/?app=${app}">← Support desk</a>`;
+    return page(`${back}<article><small>${apps.get(app)} / v${doc.version}${doc.supersedes ? ` · Supersedes v${doc.supersedes}` : ''}</small><h1>${esc(doc.title)}</h1>${doc.sections.map((s,i)=>`<section id="s${i}"><h2>${esc(s.title)}</h2><p>${esc(s.body)}</p></section>`).join('')}</article>`);
   }
   if(pathname !== '/') return new Response('Unknown page',{status:404});
   const q = (p.get('q') || '').trim();

@@ -125,6 +125,21 @@ test('Index status reflects deployed versions and links only within its pipeline
   assert.equal(get('/index-status?app=unknown').status, 404);
 });
 const ask = (app,q) => get('/?'+ new URLSearchParams({app,q})).text();
+test('Citation round trip restores the question, pipeline and answer anchor', async () => {
+  const question = 'CI-204? & "CI-204" #CI-204';
+  const html = await ask('intake', question);
+  const citation = html.match(/<section class="answer">.*?<a href="([^"]+)"/s)[1];
+  const source = await get(citation).text();
+  const back = source.match(/<a href="([^"]+)">← Back to answer/)[1];
+  const url = new URL(back, 'https://test.invalid');
+  assert.equal(url.searchParams.get('q'), question);
+  assert.equal(url.searchParams.get('app'), 'intake');
+  assert.equal(url.hash, '#answer');
+  assert.equal(await get(back).text(), html);
+  assert.match(html, /id="answer"/);
+  const direct = await get('/source?app=intake&doc=runbook&v=1.2').text();
+  assert.match(direct, /href="\/\?app=intake">← Support desk/);
+});
 for(const [app,q,fragment] of [
   ['intake','What triggers this pipeline?',0],['ledger','What triggers this pipeline?',0],
   ['intake','How do I restart safely?',2],['ledger','How do I restart safely?',2],
