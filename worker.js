@@ -83,7 +83,7 @@ export default { fetch(request) {
   if (pathname === '/source') {
     const doc = scoped.find(d => d.id === p.get('doc') && d.version === p.get('v'));
     if (!doc) return new Response('Source unavailable',{status:404});
-    return page(`<a href="/?app=${app}">← Support desk</a><article><small>${apps.get(app)} / v${doc.version}</small><h1>${esc(doc.title)}</h1>${doc.sections.map((s,i)=>`<section id="s${i}"><h2>${esc(s.title)}</h2><p>${esc(s.body)}</p></section>`).join('')}</article>`);
+    return page(`<a href="/?app=${app}">← Support desk</a><article><small>${apps.get(app)} / v${doc.version}${doc.supersedes ? ` · Supersedes v${doc.supersedes}` : ''}</small><h1>${esc(doc.title)}</h1>${doc.sections.map((s,i)=>`<section id="s${i}"><h2>${esc(s.title)}</h2><p>${esc(s.body)}</p></section>`).join('')}</article>`);
   }
   if(pathname !== '/') return new Response('Unknown page',{status:404});
   const q = (p.get('q') || '').trim();

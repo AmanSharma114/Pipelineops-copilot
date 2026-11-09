@@ -2,11 +2,47 @@ import './build.mjs';
 const { default: worker } = await import('./dist/server/index.js');
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { execFileSync } from 'node:child_process';
+import { cp, mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join, resolve } from 'node:path';
+import { pathToFileURL } from 'node:url';
+
+test('Sync replaces a version, replays identically and preserves the worker on ingest failure', async t => {
+  const root = await mkdtemp(join(tmpdir(), 'pipelineops-sync-'));
+  t.after(() => rm(root, {recursive: true, force: true}));
+  const intake = join(root, 'docs/intake');
+  await mkdir(intake, {recursive: true});
+  for (const file of ['worker.js', 'style.css', 'package.json']) await cp(file, join(root, file));
+  await cp('docs/intake/retention.md', join(intake, 'retention.md'));
+  const build = () => execFileSync(process.execPath, [resolve('build.mjs')], {cwd: root, stdio: 'pipe'});
+  const artifact = join(root, 'dist/server/index.js');
+  async function answer(revision) {
+    const {default: app} = await import(pathToFileURL(artifact).href + '?revision=' + revision);
+    return app.fetch(new Request('https://test.invalid/?app=intake&q=How+long+do+we+keep+manifests')).text();
+  }
+  build();
+  assert.match(await answer(1), /retains inbound manifests for 14 days/);
+  const update = (await readFile('docs/intake/retention@1.1.md', 'utf8')).replace('Version 1.1', 'Version 1.10');
+  await cp('docs/intake/retention@1.1.md', join(intake, 'retention@1.1.md'));
+  await writeFile(join(intake, 'retention@1.10.md'), update);
+  build();
+  const result = await answer(2);
+  assert.match(result, /doc=retention&v=1\.10#s0/);
+  assert.match(result, /retains inbound manifests for 21 days/);
+  const snapshot = await readFile(artifact, 'utf8');
+  assert.ok(!snapshot.includes('manifests for 14 days'));
+  build();
+  assert.equal(await readFile(artifact, 'utf8'), snapshot);
+  await writeFile(join(intake, 'retention@2.0.md'), update);
+  assert.throws(build);
+  assert.equal(await readFile(artifact, 'utf8'), snapshot);
+});
 
 test('Retention answers identify the item, period, and versioned source', async () => {
   const html = await ask('intake', 'How long do we keep inbound manifests?');
-  assert.match(html, /retains inbound manifests for 14 days/);
-  assert.match(html, /doc=retention&v=1\.0#s0/);
+  assert.match(html, /retains inbound manifests for 21 days/);
+  assert.match(html, /doc=retention&v=1\.1#s0/);
   for (const [app, question] of [
     ['intake', 'What is the retention period for the batch ledger?'],
     ['dispatch', 'How long is the published snapshot retained?'],

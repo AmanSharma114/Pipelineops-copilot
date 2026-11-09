@@ -65,9 +65,15 @@ From the project root, use Node.js 22+ and a Python 3.12 virtual environment. In
 
 The public retriever now checks recognized approval requests against the action in an approval clause. For retention-period requests, the section must explicitly connect the requested item with a retention expression and duration. Ambiguous matches abstain. These conservative lexical rules cover common wording; paraphrase coverage remains limited.
 
-Carrier Intake's synthetic Inbound file policy v1.0 specifies 14 days for inbound manifests after batch commitment. Dispatch Board has no documented snapshot retention period. Try both questions and follow the intake citation.
+The original Carrier Intake policy specified 14 days for inbound manifests. Revision 1.1 extends retention to 21 days after batch commitment. Dispatch Board has no documented snapshot retention period. Try both questions and follow the intake citation.
 
 On the same five-document corpus, the original lexical baseline scored 51/68, including four wrong citations. The added checks scored 55/68 with zero wrong citations and thirteen supported questions unanswered. All twelve targeted cases passed, including four valid answers and eight abstentions. The optional local semantic experiment also respects these checks and scored 57/68 with zero wrong citations. The deployed application uses the lexical implementation. Counts describe the labeled fixtures only.
+
+### Build-time version synchronization
+
+The Markdown repository keeps the initial file at `docs/<pipeline>/<id>.md`. Add a revision alongside it as `<id>@<major>.<minor>.md` with a matching `Version` header. Run `npm run build` to refresh the local Worker bundle. Each build reads the repository and selects the highest numeric version per pipeline and document ID. Older text stays in the source repository. Only the current revision enters the deployed index and source viewer. A superseded citation returns HTTP 404.
+
+The build validates all revisions before replacing the Worker bundle with a same-directory rename. The synchronization regression exercises an update, repeat build, and malformed revision against a temporary repository. Publishing still requires a release. Incremental parsing and explicit retirement are later milestones.
 
 | Phase | Deliverable | Exit check |
 | --- | --- | --- |
