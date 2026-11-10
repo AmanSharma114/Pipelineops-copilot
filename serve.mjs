@@ -5,7 +5,7 @@ const port = Number(process.env.PORT || 4173);
 http.createServer(async (req,res) => {
   try {
     const url = new URL(req.url,'http://localhost');
-    const reply = await worker.fetch(new Request(url,{method:req.method}));
+    const reply = await worker.fetch(new Request(url,{method:req.method,headers:req.headers}), process.env);
     res.writeHead(reply.status,Object.fromEntries(reply.headers));
     res.end(await reply.text());
   } catch {

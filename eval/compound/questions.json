@@ -95,5 +95,25 @@
       null,
       null
     ]
+  },
+  {
+    "app": "bay",
+    "question": "What does BP-307 mean, and who approves capacity corrections?",
+    "expected": ["runbook#0", "dou#0"]
+  },
+  {
+    "app": "departure",
+    "question": "What does GM-307 mean, and who approves replay of gate event batches?",
+    "expected": ["runbook#0", "dou#0"]
+  },
+  {
+    "app": "bay",
+    "question": "What does GM-307 mean, and how do I restart safely?",
+    "expected": [null, "sop#0"]
+  },
+  {
+    "app": "departure",
+    "question": "What does GX-912 mean, and what is the gate event data flow?",
+    "expected": [null, "flow#0"]
   }
 ]

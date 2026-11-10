@@ -1,4 +1,4 @@
-const apps = new Map([['intake','Carrier Intake'],['ledger','Route Ledger'],['dispatch','Dispatch Board']]);
+const apps = new Map([['intake','Carrier Intake'],['ledger','Route Ledger'],['dispatch','Dispatch Board'],['bay','Bay Planner'],['departure','Departure Monitor']]);
 // Only fold numeric suffixes for namespaces actually used by the runbooks.
 // This keeps ordinary phrases such as "at 15" and dotted job names intact.
 const namespaces = new Set(documents.flatMap(doc => doc.sections.flatMap(section =>
@@ -117,10 +117,10 @@ function supportsFact(row, query, fact) {
   });
 }
 
-function retrieve(app, query) {
+function retrieve(scoped, query) {
   const tokens = retrievalTerms(query);
   const fact = questionFact(query);
-  const ranked = index.filter(row => row.doc.app === app).map(row => {
+  const ranked = index.filter(row => scoped.includes(row.doc)).map(row => {
     if (fact) return { row, score: supportsFact(row, query, fact) ? 1 : 0 };
     const matches = tokens.filter(t => row.title.includes(t) || row.words.includes(t));
     const valid = matches.length && tokens.every(t => !/[-_.\d]/.test(t) || matches.includes(t));
@@ -144,20 +144,21 @@ function href(app, doc, question) {
 const pipelineRoles = {
   intake: 'Validate carrier scans',
   ledger: 'Reconcile route stops',
-  dispatch: 'Publish loading plans'
+  dispatch: 'Publish loading plans',
+  bay: 'Allocate loading bays',
+  departure: 'Reconcile gate events'
 };
 
-function pipelineMap(active) {
+function pipelineMap(active, grants) {
   return `<nav class="flow" aria-label="Select a pipeline">
     <div class="flow-label">Freight data flow</div>
-    <div class="stations">${[...apps].map(([id, name]) => `<div class="station">
+    <div class="stations">${[...apps].filter(([id]) => grants.has(id)).map(([id, name]) => `<div class="station">
       <a aria-current="${id === active ? 'page' : 'false'}" href="/?app=${id}">${name}</a>
       <small>${pipelineRoles[id]}</small></div>`).join('')}</div>
   </nav>`;
 }
 
-function sourceLibrary(app, scoped) {
-  const retired = withdrawals.filter(doc => doc.app === app);
+function sourceLibrary(app, scoped, retired) {
   return `<aside><div class="panel-title"><h2>Source library</h2><small>${scoped.length} ${scoped.length === 1 ? 'document' : 'documents'}</small></div>
     ${scoped.map(doc => `<details class="document"><summary><span>${esc(doc.title)}</span><small>v${doc.version}</small></summary>
       <ol>${doc.sections.map((section,i) => `<li><a href="${href(app, doc)}#s${i}">${esc(section.title)}</a></li>`).join('')}</ol></details>
@@ -167,8 +168,7 @@ function sourceLibrary(app, scoped) {
   </aside>`;
 }
 
-function indexStatus(app, current) {
-  const retired = withdrawals.filter(doc => doc.app === app);
+function indexStatus(app, current, retired) {
   const sections = current.reduce((count, doc) => count + doc.sections.length, 0);
   const counts = [[current.length, 'Searchable documents'], [sections, 'Indexed sections'], [retired.length, 'Retired documents']];
   const rows = [...current, ...retired].map(doc => {
@@ -183,8 +183,8 @@ function indexStatus(app, current) {
     <h2>Document versions</h2><ul>${rows.join('')}</ul></article>`;
 }
 
-function answerPart(app, q, clause, first, compound) {
-  const matches = retrieve(app, clause);
+function answerPart(app, scoped, q, clause, first, compound) {
+  const matches = retrieve(scoped, clause);
   const anchor = ' id="answer" tabindex="-1"';
   const hit = matches.length === 1 ? matches[0] : null;
   const ambiguous = matches.length > 1;
@@ -199,39 +199,62 @@ function answerPart(app, q, clause, first, compound) {
   return label + answer + choices;
 }
 
-function supportDesk(app, scoped, q) {
+function supportDesk(app, scoped, q, retired, grants) {
   const examples = [
     ['Schedule', 'What triggers this pipeline?'],
     ['Recovery', 'How do I restart safely?']
   ];
   if (app === 'dispatch') examples.push(['Late release', 'What should I do when Dispatch Board misses its cutoff, and who can approve manual publication?']);
   const clauses = q.split(/(?:,?\s+and\s+|\?\s+)(?=(?:what|who|when|where|how|which|can\s+(?:I|we))\b)/i);
-  const answer = q ? clauses.map((clause, i) => answerPart(app, q, clause, i === 0, clauses.length > 1)).join('') : '';
+  const answer = q ? clauses.map((clause, i) => answerPart(app, scoped, q, clause, i === 0, clauses.length > 1)).join('') : '';
   const incident = scoped.flatMap(doc => doc.sections).map(section => section.title.match(/^([A-Z]+-\d+) (.+)$/)).find(Boolean);
   const askLink = question => '/?app=' + app + '&amp;q=' + encodeURIComponent(question) + '#answer';
   const start = incident && !q ? `<div class="incident"><div><small>Sample incident</small>
     <h2><code>${incident[1]}</code> ${esc(incident[2])}</h2></div><a href="${askLink('What does ' + incident[1] + ' mean?')}">Investigate <span aria-hidden="true">→</span></a></div>` : '';
   return `<div class="overview"><div><small class="eyebrow">Freight operations</small><h1>Pipeline support desk</h1>
-    <p>Trace an incident from error code to recovery procedure.</p></div>${pipelineMap(app)}</div>
+    <p>Trace an incident from error code to recovery procedure.</p></div>${pipelineMap(app, grants)}</div>
     <div class="layout"><div class="workspace"><h2 class="pipeline-name">${apps.get(app)}</h2>${start}
     <form action="/#answer" method="get"><input type="hidden" name="app" value="${app}"><label for="q">Ask about ${apps.get(app)}</label>
     <div class="compose"><input id="q" name="q" maxlength="320" required placeholder="Enter a question or error code…" value="${esc(q)}"><button>Ask ↗</button></div>
     <div class="examples">${examples.map(([label,s]) => `<a title="${s}" href="${askLink(s)}">${label} ↗</a>`).join('')}</div></form>${answer}</div>
-    ${sourceLibrary(app,scoped)}</div>`;
+    ${sourceLibrary(app,scoped,retired)}</div>`;
 }
 
 function page(main, status = 200) {
   return new Response(`<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>PipelineOps Copilot</title><style>${css}</style><header><a class="brand" href="/"><b aria-hidden="true">⌁</b> PipelineOps <small>Copilot</small></a><div class="header-links"><span class="status">Synthetic demo</span><a href="https://github.com/AmanSharma114/Pipelineops-copilot">GitHub ↗</a></div></header><main>${main}</main></html>`,{status,headers:{'content-type':'text/html; charset=utf-8','content-security-policy':"default-src 'none'; style-src 'unsafe-inline'; form-action 'self'; base-uri 'none'; frame-ancestors 'none'",'x-content-type-options':'nosniff'}});
 }
-export default { fetch(request) {
+// An application/document pair must have an explicit grant to appear anywhere in the desk.
+const pipelineGuides = ['handbook','sop','dou','flow','runbook'];
+export const publicGrants = new Map([
+  ['intake',['runbook','retention','validation']], ['ledger',['runbook']],
+  ['dispatch',['handbook','runbook','handoff']], ['bay',pipelineGuides], ['departure',pipelineGuides]
+]);
+const gateGrants = new Map([['bay',['handbook','dou']], ['departure',[...pipelineGuides,'operator-notes']]]);
+
+function readDesk(request, env) {
   if(request.method !== 'GET') return new Response('Read only',{status:405,headers:{Allow:'GET'}});
   const {pathname,searchParams:p} = new URL(request.url);
-  const app = p.get('app') ?? 'intake';
-  if (!apps.has(app)) return new Response('Unknown pipeline',{status:404});
-  const scoped = documents.filter(doc => doc.app === app);
-  if (pathname === '/index-status') return page(indexStatus(app, scoped));
+  const auth = request.headers.get('Authorization');
+  let grants = publicGrants;
+  if (auth !== null || pathname === '/operator') {
+    // The host supplies this optional secret. Anonymous visitors never inherit operator grants.
+    const password = env.GATE_OPERATOR_PASSWORD;
+    const expected = password && btoa(Array.from(new TextEncoder().encode('gate:' + password), byte => String.fromCharCode(byte)).join(''));
+    if (!expected || auth !== 'Basic ' + expected) {
+      return new Response('Operator authentication required', {status:401,headers:{'WWW-Authenticate':'Basic realm="PipelineOps gate operations"'}});
+    }
+    grants = gateGrants;
+    if (pathname === '/operator') return new Response(null, {status:302,headers:{Location:'/?app=departure'}});
+  }
+  const app = p.get('app') ?? grants.keys().next().value;
+  const allowed = grants.get(app);
+  if (!allowed) return new Response('Unknown pipeline',{status:404});
+  const permitted = doc => doc.app === app && allowed.includes(doc.id);
+  const scoped = documents.filter(permitted);
+  const retiredDocs = withdrawals.filter(permitted);
+  if (pathname === '/index-status') return page(indexStatus(app, scoped, retiredDocs));
   if (pathname === '/source') {
-    const retired = withdrawals.find(d => d.app === app && d.id === p.get('doc') && d.versions.includes(p.get('v')));
+    const retired = retiredDocs.find(d => d.id === p.get('doc') && d.versions.includes(p.get('v')));
     if (retired) return page(`<article><small>${apps.get(app)} · Retired at v${retired.version}</small>
       <h1>${esc(retired.title)}</h1><p>This guide was withdrawn. Its passages have been removed from support search.</p>
       <a href="/?app=${app}">View current ${apps.get(app)} sources →</a></article>`, 410);
@@ -246,5 +269,12 @@ export default { fetch(request) {
   if(pathname !== '/') return new Response('Unknown page',{status:404});
   const q = (p.get('q') || '').trim();
   if(q.length > 320) return new Response('Question exceeds 320 characters',{status:400});
-  return page(supportDesk(app, scoped, q));
+  return page(supportDesk(app, scoped, q, retiredDocs, grants));
+}
+
+export default { fetch(request, env = {}) {
+  const response = readDesk(request, env);
+  response.headers.set('Cache-Control', 'private, no-store');
+  response.headers.set('Vary', 'Authorization');
+  return response;
 }};

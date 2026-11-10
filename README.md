@@ -8,19 +8,44 @@ Aman Sharma built this independent portfolio demo around a support engineer's ev
 
 ## Try a one-minute investigation
 
+### Five connected applications
+
+```mermaid
+flowchart LR
+  I[Carrier Intake] -->|Committed scans| L[Route Ledger]
+  L -->|Released ledger partition| D[Dispatch Board]
+  D -->|Published dispatch snapshot| B[Bay Planner]
+  B -->|Released bay assignments| G[Departure Monitor]
+  C[Yard capacity file] --> B
+  E[Gate event batches] --> G
+```
+
+Bay Planner allocates loading slots and checks for conflicting occupancy. Departure Monitor reconciles gate scans against the released bay plan. Each has a handbook, operating procedure, support agreement (DOU), architecture and data-flow specification, and troubleshooting runbook. [Investigate a bay collision](https://pipelineops-freight-copilot.aamansharmamu114.chatgpt.site/?app=bay&q=BP-307) or [trace an unmatched gate departure](https://pipelineops-freight-copilot.aamansharmamu114.chatgpt.site/?app=departure&q=GM-307).
+
+### Application and document permissions
+
+The backend checks an explicit application/document allowlist before ranking sections or resolving citations. The selector, suggested incidents, source library, index status, and withdrawal notices use the caller's grants. New document IDs require an explicit grant.
+
+| Caller | Applications and documents available |
+| --- | --- |
+| Anonymous visitor | Published demo documents across all five applications |
+| Gate operator demo account | Bay Planner handbook and DOU; all Departure Monitor guides, including the synthetic shift notes |
+
+To exercise the operator account locally, supply a strong `GATE_OPERATOR_PASSWORD` through the process environment before running `npm start`. Open `/operator` and sign in with HTTP Basic username `gate`. Hosted activation requires the equivalent Worker secret and HTTPS. With no password configured the operator route returns 401. The public demo uses the anonymous scope. The optional account demonstrates server-side authorization with fictional data; the repository itself is public.
+
 For a two-document investigation, select Dispatch Board and choose **Late release**. The desk retrieves the missed-cutoff procedure from the runbook and publication authority from the handbook. Each passage has its own versioned citation. Explicit follow-up clauses such as “and who …” are searched independently within the selected pipeline. A missing passage leaves that part marked as insufficient evidence.
 
 1. Open [Carrier Intake's CI-204 incident](https://pipelineops-freight-copilot.aamansharmamu114.chatgpt.site/?app=intake&q=CI-204). The runbook explains why the missing ready marker matters and what the engineer should ask the carrier to resend.
 2. Follow the citation beneath the excerpt. The source viewer highlights the matching section of runbook v1.2.
 3. Try [the same error code under Route Ledger](https://pipelineops-freight-copilot.aamansharmamu114.chatgpt.site/?app=ledger&q=CI-204). The backend searches only that pipeline and reports insufficient evidence.
 
-On the current 125 labeled questions, the deployed handler produced 117 expected outcomes. It declined eight supported questions and returned zero wrong citations. Run `node eval.mjs` to verify the versioned excerpt and source section for each supported answer.
+On the current 139 labeled questions, the deployed handler produced 131 expected outcomes. It declined eight supported questions and returned zero wrong citations. Run `node eval.mjs` to verify the versioned excerpt and source section for each supported answer.
 
 ### Multi-part answer evaluation
 
-Run `npm run eval:compound` to check twelve multi-part questions across all three pipelines. The suite scores each question as complete only when the part count and order match and every part passes. For supported parts it follows the versioned citation and compares the excerpt to the selected source section. For unsupported parts it requires an explicit abstention with no answer citation.
+Run `npm run eval:compound` to check sixteen multi-part questions across all five pipelines. The suite scores each question as complete only when the part count and order match and every part passes. For supported parts it follows the versioned citation and compares the excerpt to the selected source section. For unsupported parts it requires an explicit abstention with no answer citation.
 
-The first run passed 11/12 questions. A schedule question followed by “and can I force a restart” had been treated as one request. After recognizing that clause boundary, all 12 questions passed, including all seven mixed-evidence cases. All 14 supported parts cited the expected passage and all 11 unsupported parts abstained. These fixtures supplement the separate 125-question single-part evaluation.
+The first run passed 11/12 questions. A schedule question followed by “and can I force a restart” had been treated as one request. After recognizing that clause boundary, all 12 questions passed, including all seven mixed-evidence cases. All 14 supported parts cited the expected passage and all 11 unsupported parts abstained. After adding Bay Planner and Departure Monitor, the expanded suite verified 20/20 citations, 13/13 abstentions, and 9/9 mixed-evidence questions.
 
 ### Local request latency
 
@@ -28,7 +53,7 @@ The first run passed 11/12 questions. A schedule question followed by “and can
 
 ## Run locally
 
-The optional browser check follows Route Ledger's RL-410 incident from pipeline selection to the cited passage and back. With Playwright available to Node and its Chromium browser installed, run `node eval/browser-journey.cjs <origin>` against a running desk. To use installed Microsoft Edge, set `PLAYWRIGHT_CHANNEL=msedge`. It checks desktop mouse, emulated touch at two widths, and keyboard-only navigation.
+The optional browser check follows one incident in each of the five pipelines from selection to the cited passage and back. With Playwright available to Node and its Chromium browser installed, run `node eval/browser-journey.cjs <origin>` against a running desk. To use installed Microsoft Edge, set `PLAYWRIGHT_CHANNEL=msedge`. It checks desktop mouse, emulated touch at two widths, and keyboard-only navigation.
 
 Use Node.js 22 or newer. From this directory run `npm start` and open http://127.0.0.1:4173. Use `npm test` for the retrieval and route checks. Neither command requires installing packages or configuring secrets.
 
@@ -44,7 +69,7 @@ flowchart LR
   A --> V[Versioned source viewer]
 ```
 
-The build embeds six searchable synthetic documents with seventeen sections in a single Fetch-compatible Worker. All three pipelines are public demo scopes. Search filters the index before ranking. Title matches carry more weight than body matches. Identifier-like terms must match, and tied scores yield an abstention. The citation viewer resolves pipeline, document, version and section. All source changes require a rebuild.
+The build embeds sixteen publicly searchable synthetic documents with thirty-seven sections in a single Fetch-compatible Worker. The anonymous demo grants access to the published documents in all five pipelines. Search filters the index before ranking. Title matches carry more weight than body matches. Identifier-like terms must match, and tied scores yield an abstention. The citation viewer resolves pipeline, document, version and section. All source changes require a rebuild.
 
 An extractive baseline makes grounding inspectable and keeps query costs independent of model tokens. Lexical overlap is an approximation of relevance. Paraphrases, negation, and questions requiring several sections need separate evaluation. There is no language model or embedding service in this milestone.
 

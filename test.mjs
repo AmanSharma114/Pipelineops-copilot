@@ -8,6 +8,57 @@ import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { readCurrentDocuments } from './sync.mjs';
+import { randomUUID } from 'node:crypto';
+
+test('Five selectable pipelines isolate incident lookups across all 25 app/code pairs', async () => {
+  const fixtures = [
+    ['intake','CI-204','ready marker'], ['ledger','RL-410','conflicting pair'],
+    ['dispatch','DB-410','08:05 UTC'], ['bay','BP-307','overlap.csv'],
+    ['departure','GM-307','freight.gate_pending']
+  ];
+  const home = await get('/').text();
+  for (const [app] of fixtures) {
+    assert.ok(home.includes('href="/?app=' + app + '"'));
+    for (const [owner, code, passage] of fixtures) {
+      const answer = await ask(app, code);
+      if (app === owner) {
+        assert.ok(answer.includes(passage));
+        assert.ok(answer.includes('/source?app=' + app + '&q='));
+      } else assert.ok(answer.includes('INSUFFICIENT EVIDENCE'));
+    }
+  }
+});
+
+test('Server grants apply to selection, searches, suggestions, library, index status and versioned sources', async () => {
+  const env = {GATE_OPERATOR_PASSWORD: randomUUID()};
+  const authorization = 'Basic ' + btoa('gate:' + env.GATE_OPERATOR_PASSWORD);
+  const visit = (path, headers = {}) => worker.fetch(new Request('https://test.invalid' + path, {headers}), env);
+  const desk = '/?app=departure&q=GX-912';
+  const privateSource = '/source?app=departure&doc=operator-notes&v=1.0';
+  const forged = {'X-Role':'gate', 'X-Allowed-Apps':'departure'};
+  assert.match(await visit(desk + '&role=gate', forged).text(), /INSUFFICIENT EVIDENCE/);
+  assert.equal(visit(privateSource, forged).status, 404);
+  assert.equal(visit('/operator').status, 401);
+  assert.equal(visit(desk, {authorization:'Basic invalid'}).status, 401);
+  assert.equal(visit('/operator', {authorization}).headers.get('Location'), '/?app=departure');
+  const guestStatus = await visit('/index-status?app=departure').text();
+  assert.ok(!guestStatus.includes('Gate operator shift notes'));
+  const operatorAnswer = visit(desk, {authorization});
+  assert.match(operatorAnswer.headers.get('Cache-Control'), /no-store/);
+  const html = await operatorAnswer.text();
+  assert.ok(html.includes('doc=operator-notes&v=1.0#s0'));
+  assert.ok(!html.includes('href="/?app=intake"'));
+  assert.equal(visit(privateSource, {authorization}).status, 200);
+  assert.equal(visit(desk + '&q=anything', {authorization:'Bearer unknown'}).status, 401);
+  for (const path of ['/?app=ledger','/index-status?app=intake','/source?app=dispatch&doc=handoff&v=1.0','/source?app=bay&doc=runbook&v=1.0']) {
+    assert.equal(visit(path, {authorization}).status, 404);
+  }
+  const bayStatus = await visit('/index-status?app=bay', {authorization}).text();
+  assert.ok(bayStatus.includes('Bay planning support agreement'));
+  assert.ok(!bayStatus.includes('Bay Planner troubleshooting runbook'));
+  assert.match(await visit('/?app=bay&q=BP-307', {authorization}).text(), /INSUFFICIENT EVIDENCE/);
+  assert.equal(visit('/source?app=bay&doc=dou&v=1.0', {authorization}).status, 200);
+});
 
 test('Incremental parsing handles warm replay, same-size edits, deletion and damaged cache', async t => {
   const root = await mkdtemp(join(tmpdir(), 'pipelineops-cache-'));

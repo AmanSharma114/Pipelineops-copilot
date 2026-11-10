@@ -1,7 +1,7 @@
 // Run from the project root. Exercise the deployed handler for the lexical baseline.
 import { docs } from '../build.mjs';
 import { loadQuestions } from './fixtures.mjs';
-const { default: worker, questionFact } = await import('../dist/server/index.js');
+const { default: worker, questionFact, publicGrants } = await import('../dist/server/index.js');
 const questions = [];
 for (const row of await loadQuestions()) {
   const url = new URL('https://benchmark.invalid/');
@@ -17,4 +17,5 @@ for (const row of await loadQuestions()) {
   } else if (!answer.includes('INSUFFICIENT EVIDENCE')) throw Error('Missing answer state');
   questions.push({...row, lexical, requiredFact: questionFact(row.question)});
 }
-console.log(JSON.stringify({docs, questions}));
+const publicDocs = docs.filter(doc => publicGrants.get(doc.app)?.includes(doc.id));
+console.log(JSON.stringify({docs: publicDocs, questions}));

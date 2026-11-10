@@ -1,0 +1,116 @@
+[
+  {
+    "split": "new-pipelines",
+    "app": "bay",
+    "question": "What triggers this pipeline?",
+    "expected": {
+      "doc": "handbook",
+      "section": 0
+    }
+  },
+  {
+    "split": "new-pipelines",
+    "app": "bay",
+    "question": "How do I restart safely?",
+    "expected": {
+      "doc": "sop",
+      "section": 0
+    }
+  },
+  {
+    "split": "new-pipelines",
+    "app": "bay",
+    "question": "Who approves capacity corrections?",
+    "expected": {
+      "doc": "dou",
+      "section": 0
+    }
+  },
+  {
+    "split": "new-pipelines",
+    "app": "bay",
+    "question": "What does BP307 mean?",
+    "expected": {
+      "doc": "runbook",
+      "section": 0
+    }
+  },
+  {
+    "split": "new-pipelines",
+    "app": "bay",
+    "question": "How does the allocation data flow?",
+    "expected": {
+      "doc": "flow",
+      "section": 0
+    }
+  },
+  {
+    "split": "new-pipelines",
+    "app": "bay",
+    "question": "GM-307",
+    "expected": null
+  },
+  {
+    "split": "new-pipelines",
+    "app": "bay",
+    "question": "GX-912",
+    "expected": null
+  },
+  {
+    "split": "new-pipelines",
+    "app": "departure",
+    "question": "How often does it run?",
+    "expected": {
+      "doc": "handbook",
+      "section": 0
+    }
+  },
+  {
+    "split": "new-pipelines",
+    "app": "departure",
+    "question": "How do I restart safely?",
+    "expected": {
+      "doc": "sop",
+      "section": 0
+    }
+  },
+  {
+    "split": "new-pipelines",
+    "app": "departure",
+    "question": "Who approves replay of gate event batches?",
+    "expected": {
+      "doc": "dou",
+      "section": 0
+    }
+  },
+  {
+    "split": "new-pipelines",
+    "app": "departure",
+    "question": "GM307",
+    "expected": {
+      "doc": "runbook",
+      "section": 0
+    }
+  },
+  {
+    "split": "new-pipelines",
+    "app": "departure",
+    "question": "What is the gate event data flow?",
+    "expected": {
+      "doc": "flow",
+      "section": 0
+    }
+  },
+  {
+    "split": "new-pipelines",
+    "app": "departure",
+    "question": "BP-307",
+    "expected": null
+  },
+  {
+    "split": "new-pipelines",
+    "app": "departure",
+    "question": "GX-912",
+    "expected": null
+  }
+]
