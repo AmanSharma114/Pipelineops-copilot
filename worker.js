@@ -205,7 +205,7 @@ function supportDesk(app, scoped, q) {
     ['Recovery', 'How do I restart safely?']
   ];
   if (app === 'dispatch') examples.push(['Late release', 'What should I do when Dispatch Board misses its cutoff, and who can approve manual publication?']);
-  const clauses = q.split(/(?:,?\s+and\s+|\?\s+)(?=(?:what|who|when|where|how|which)\b)/i);
+  const clauses = q.split(/(?:,?\s+and\s+|\?\s+)(?=(?:what|who|when|where|how|which|can\s+(?:I|we))\b)/i);
   const answer = q ? clauses.map((clause, i) => answerPart(app, q, clause, i === 0, clauses.length > 1)).join('') : '';
   const incident = scoped.flatMap(doc => doc.sections).map(section => section.title.match(/^([A-Z]+-\d+) (.+)$/)).find(Boolean);
   const askLink = question => '/?app=' + app + '&amp;q=' + encodeURIComponent(question) + '#answer';

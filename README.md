@@ -16,6 +16,12 @@ For a two-document investigation, select Dispatch Board and choose **Late releas
 
 On the current 125 labeled questions, the deployed handler produced 117 expected outcomes. It declined eight supported questions and returned zero wrong citations. Run `node eval.mjs` to verify the versioned excerpt and source section for each supported answer.
 
+### Multi-part answer evaluation
+
+Run `npm run eval:compound` to check twelve multi-part questions across all three pipelines. The suite scores each question as complete only when the part count and order match and every part passes. For supported parts it follows the versioned citation and compares the excerpt to the selected source section. For unsupported parts it requires an explicit abstention with no answer citation.
+
+The first run passed 11/12 questions. A schedule question followed by “and can I force a restart” had been treated as one request. After recognizing that clause boundary, all 12 questions passed, including all seven mixed-evidence cases. All 14 supported parts cited the expected passage and all 11 unsupported parts abstained. These fixtures supplement the separate 125-question single-part evaluation.
+
 ### Local request latency
 
 `npm run benchmark` builds the Worker and replays the same labeled questions through its normal support-desk route. On Windows x64 with Node v24.22.1, one run recorded a median of **0.128 ms** and a **95th percentile of 0.380 ms** across 1,250 sequential requests after 125 warm-up requests. Timing starts with the constructed request and ends after reading the HTML response body. It covers local retrieval and page rendering. Network transit, cold starts, browser rendering, and source-link navigation are outside the measurement.

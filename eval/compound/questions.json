@@ -1,0 +1,99 @@
+[
+  {
+    "app": "intake",
+    "question": "What does CI-422 mean, and how long are inbound manifests retained?",
+    "expected": [
+      "validation#1",
+      "retention#0"
+    ]
+  },
+  {
+    "app": "intake",
+    "question": "How long are inbound manifests retained? Who approves overtime?",
+    "expected": [
+      "retention#0",
+      null
+    ]
+  },
+  {
+    "app": "intake",
+    "question": "What does RL-410 mean, and where are validated scans published?",
+    "expected": [
+      null,
+      "runbook#3"
+    ]
+  },
+  {
+    "app": "intake",
+    "question": "What does DB-410 mean, and who approves manual publication?",
+    "expected": [
+      null,
+      null
+    ]
+  },
+  {
+    "app": "ledger",
+    "question": "What does RL-410 mean, and who approves corrections to conflicting stop IDs?",
+    "expected": [
+      "runbook#1",
+      "runbook#3"
+    ]
+  },
+  {
+    "app": "ledger",
+    "question": "How often does it run, and can I force a restart while a writer is active?",
+    "expected": [
+      "runbook#0",
+      null
+    ]
+  },
+  {
+    "app": "ledger",
+    "question": "What does CI-422 mean? How do I restart safely?",
+    "expected": [
+      null,
+      "runbook#2"
+    ]
+  },
+  {
+    "app": "ledger",
+    "question": "What does RL-410 mean, and how often does it run, and who approves payroll?",
+    "expected": [
+      "runbook#1",
+      "runbook#0",
+      null
+    ]
+  },
+  {
+    "app": "dispatch",
+    "question": "Who approves manual publication, and what is the upstream release deadline?",
+    "expected": [
+      "handbook#0",
+      "runbook#1"
+    ]
+  },
+  {
+    "app": "dispatch",
+    "question": "What is the weekend cutoff, and who gives permission to publish the board by hand?",
+    "expected": [
+      null,
+      "handbook#0"
+    ]
+  },
+  {
+    "app": "dispatch",
+    "question": "What does DB-410 mean? How long are snapshots retained?",
+    "expected": [
+      "runbook#1",
+      null
+    ]
+  },
+  {
+    "app": "dispatch",
+    "question": "What does DH-118 mean, and who approves automatic publication?",
+    "expected": [
+      null,
+      null
+    ]
+  }
+]
