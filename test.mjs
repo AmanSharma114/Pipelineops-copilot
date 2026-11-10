@@ -27,12 +27,23 @@ test('Learning batch keeps latest revisions and detects conflicts even on older 
   assert.throws(() => reconcile([...rows, {...rows[1], status:'revoked'}]), /LC-409/);
 });
 
-test('Seven selectable applications isolate incident lookups across all 49 app/code pairs', async () => {
+test('Water batch validates sequence coverage, calibration and replay identity', async () => {
+  const {summarizeWater} = await import('./batches/water/run.mjs');
+  const batch = JSON.parse(await readFile('batches/water/sample.json','utf8'));
+  const result = summarizeWater(batch);
+  assert.deepEqual([result.samples,result.minNtu,result.maxNtu], [3,0.38,0.46]);
+  assert.deepEqual(summarizeWater({...batch, readings:[...batch.readings].reverse()}), result);
+  assert.throws(() => summarizeWater({...batch,last:123}), /WQ-104/);
+  assert.throws(() => summarizeWater({...batch,calibration:'stale'}), /WQ-208/);
+  assert.throws(() => summarizeWater({...batch, readings:[...batch.readings,{...batch.readings[0],ntu:2}]}), /WQ-409/);
+});
+
+test('Eight selectable applications isolate incident lookups across all 64 app/code pairs', async () => {
   const fixtures = [
     ['intake','CI-204','ready marker'], ['ledger','RL-410','conflicting pair'],
     ['dispatch','DB-410','08:05 UTC'], ['bay','BP-307','overlap.csv'],
     ['departure','GM-307','freight.gate_pending'], ['meter','MR-104','missing reading'],
-    ['learning','LC-409','authoritative status']
+    ['learning','LC-409','authoritative status'], ['water','WQ-104','complete export']
   ];
   const home = await get('/').text();
   for (const [app] of fixtures) {

@@ -24,13 +24,14 @@ Bay Planner allocates loading slots and checks for conflicting occupancy. Depart
 
 ### Independent pipelines
 
-**Meter Rollup** reads quarter-hour electricity readings from a synthetic meter-gateway export and produces one watt-hour total per meter and UTC hour. **Learning Completion Sync** reads events from a synthetic learning-system export and reconciles the current course status per learner. Each job has its own source, output, operating schedule, support owner, incident codes, and five support guides. Both run directly from their own inputs.
+**Meter Rollup** reads quarter-hour electricity readings from a synthetic meter-gateway export and produces one watt-hour total per meter and UTC hour. **Learning Completion Sync** reads events from a synthetic learning-system export and reconciles the current course status per learner. Each job has its own source, output, operating schedule, support owner, incident codes, and five support guides. Water Quality Monitor validates a sealed sensor export for complete sample sequences and consistent calibration, then reports the observed turbidity range. All three run from independent inputs.
 
 From the project root, run either sample with Node.js:
 
 ```sh
 node batches/run.mjs meter
 node batches/run.mjs learning
+node batches/run.mjs water
 ```
 
 Pass an optional JSON file as the final argument to use another export. Each job writes results to standard output after validating the full batch. The schedules described in the handbooks are reference operating schedules; the public desk provides cited support guidance. [Investigate a missing meter interval](https://pipelineops-freight-copilot.aamansharmamu114.chatgpt.site/?app=meter&q=MR-104) or [investigate a conflicting course revision](https://pipelineops-freight-copilot.aamansharmamu114.chatgpt.site/?app=learning&q=LC-409).
@@ -41,7 +42,7 @@ The backend checks an explicit application/document allowlist before ranking sec
 
 | Caller | Applications and documents available |
 | --- | --- |
-| Anonymous visitor | Published demo documents across all seven applications |
+| Anonymous visitor | Published demo documents across all eight applications |
 | Gate operator demo account | Bay Planner handbook and DOU; all Departure Monitor guides, including the synthetic shift notes |
 
 To exercise the operator account locally, supply a strong `GATE_OPERATOR_PASSWORD` through the process environment before running `npm start`. Open `/operator` and sign in with HTTP Basic username `gate`. Hosted activation requires the equivalent Worker secret and HTTPS. With no password configured the operator route returns 401. The public demo uses the anonymous scope. The optional account demonstrates server-side authorization with fictional data; the repository itself is public.
@@ -56,7 +57,7 @@ On the current 153 labeled questions, the deployed handler produced 145 expected
 
 ### Multi-part answer evaluation
 
-Run `npm run eval:compound` to check twenty multi-part questions across all seven applications. The suite scores each question as complete only when the part count and order match and every part passes. For supported parts it follows the versioned citation and compares the excerpt to the selected source section. For unsupported parts it requires an explicit abstention with no answer citation.
+Run `npm run eval:compound` to check twenty multi-part questions across seven applications. The suite scores each question as complete only when the part count and order match and every part passes. For supported parts it follows the versioned citation and compares the excerpt to the selected source section. For unsupported parts it requires an explicit abstention with no answer citation.
 
 The first run passed 11/12 questions. A schedule question followed by “and can I force a restart” had been treated as one request. After recognizing that clause boundary, all 12 questions passed, including all seven mixed-evidence cases. All 14 supported parts cited the expected passage and all 11 unsupported parts abstained. After adding Bay Planner and Departure Monitor, the expanded suite verified 20/20 citations, 13/13 abstentions, and 9/9 mixed-evidence questions. With the independent pipelines, the current suite verifies 26/26 citations and 15/15 abstentions.
 
@@ -66,7 +67,7 @@ The first run passed 11/12 questions. A schedule question followed by “and can
 
 ## Run locally
 
-The optional browser check follows one incident in each of the seven applications from selection to the cited passage and back. With Playwright available to Node and its Chromium browser installed, run `node eval/browser-journey.cjs <origin>` against a running desk. To use installed Microsoft Edge, set `PLAYWRIGHT_CHANNEL=msedge`. It checks desktop mouse, emulated touch at two widths, and keyboard-only navigation.
+The optional browser check follows one incident in each of the eight applications from selection to the cited passage and back. With Playwright available to Node and its Chromium browser installed, run `node eval/browser-journey.cjs <origin>` against a running desk. To use installed Microsoft Edge, set `PLAYWRIGHT_CHANNEL=msedge`. It checks desktop mouse, emulated touch at two widths, and keyboard-only navigation.
 
 Use Node.js 22 or newer. From this directory run `npm start` and open http://127.0.0.1:4173. Use `npm test` for the retrieval and route checks. Neither command requires installing packages or configuring secrets.
 
@@ -82,7 +83,7 @@ flowchart LR
   A --> V[Versioned source viewer]
 ```
 
-The build embeds twenty-six publicly searchable synthetic documents with fifty-seven sections in a single Fetch-compatible Worker. The anonymous demo grants access to the published documents in all seven applications. Search filters the index before ranking. Title matches carry more weight than body matches. Identifier-like terms must match, and tied scores yield an abstention. The citation viewer resolves pipeline, document, version and section. All source changes require a rebuild.
+The build embeds thirty-one publicly searchable synthetic documents with sixty-eight sections in a single Fetch-compatible Worker. The anonymous demo grants access to the published documents in all eight applications. Search filters the index before ranking. Title matches carry more weight than body matches. Identifier-like terms must match, and tied scores yield an abstention. The citation viewer resolves pipeline, document, version and section. All source changes require a rebuild.
 
 An extractive baseline makes grounding inspectable and keeps query costs independent of model tokens. Lexical overlap is an approximation of relevance. Paraphrases, negation, and questions requiring several sections need separate evaluation. There is no language model or embedding service in this milestone.
 

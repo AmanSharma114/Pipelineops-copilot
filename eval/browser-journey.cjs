@@ -10,7 +10,8 @@ const incidents = [
   ['bay', 'Bay Planner', 'BP-307', 'overlap.csv'],
   ['departure', 'Departure Monitor', 'GM-307', 'freight.gate_pending'],
   ['meter', 'Meter Rollup', 'MR-104', 'four distinct quarter-hour intervals'],
-  ['learning', 'Learning Completion Sync', 'LC-409', 'authoritative status']
+  ['learning', 'Learning Completion Sync', 'LC-409', 'authoritative status'],
+  ['water', 'Water Quality Monitor', 'WQ-104', 'complete export']
 ];
 
 async function tabTo(page, selector) {

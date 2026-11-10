@@ -1,0 +1,28 @@
+{
+  "probe": "PROBE-17",
+  "calibration": "CAL-R3",
+  "first": 120,
+  "last": 122,
+  "readings": [
+    {
+      "seq": 121,
+      "ntu": 0.42,
+      "calibration": "CAL-R3"
+    },
+    {
+      "seq": 120,
+      "ntu": 0.38,
+      "calibration": "CAL-R3"
+    },
+    {
+      "seq": 122,
+      "ntu": 0.46,
+      "calibration": "CAL-R3"
+    },
+    {
+      "seq": 121,
+      "ntu": 0.42,
+      "calibration": "CAL-R3"
+    }
+  ]
+}

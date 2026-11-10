@@ -1,4 +1,4 @@
-const apps = new Map([['intake','Carrier Intake'],['ledger','Route Ledger'],['dispatch','Dispatch Board'],['bay','Bay Planner'],['departure','Departure Monitor'],['meter','Meter Rollup'],['learning','Learning Completion Sync']]);
+const apps = new Map([['intake','Carrier Intake'],['ledger','Route Ledger'],['dispatch','Dispatch Board'],['bay','Bay Planner'],['departure','Departure Monitor'],['meter','Meter Rollup'],['learning','Learning Completion Sync'],['water','Water Quality Monitor']]);
 // Only fold numeric suffixes for namespaces actually used by the runbooks.
 // This keeps ordinary phrases such as "at 15" and dotted job names intact.
 const namespaces = new Set(documents.flatMap(doc => doc.sections.flatMap(section =>
@@ -148,7 +148,8 @@ const pipelineRoles = {
   bay: 'Allocate loading bays',
   departure: 'Reconcile gate events',
   meter: 'Aggregate electricity readings',
-  learning: 'Reconcile course completions'
+  learning: 'Reconcile course completions',
+  water: 'Validate probe telemetry'
 };
 
 function pipelineMap(active, grants) {
@@ -162,7 +163,7 @@ function pipelineMap(active, grants) {
   };
   return `<nav class="flow" aria-label="Select a pipeline">
     ${group('Freight data flow', ['intake','ledger','dispatch','bay','departure'])}
-    ${group('Independent pipelines', ['meter','learning'], true)}</nav>`;
+    ${group('Independent pipelines', ['meter','learning','water'], true)}</nav>`;
 }
 
 function sourceLibrary(app, scoped, retired) {
@@ -235,7 +236,7 @@ const pipelineGuides = ['handbook','sop','dou','flow','runbook'];
 export const publicGrants = new Map([
   ['intake',['runbook','retention','validation']], ['ledger',['runbook']],
   ['dispatch',['handbook','runbook','handoff']], ['bay',pipelineGuides], ['departure',pipelineGuides],
-  ['meter',pipelineGuides], ['learning',pipelineGuides]
+  ['meter',pipelineGuides], ['learning',pipelineGuides], ['water',pipelineGuides]
 ]);
 const gateGrants = new Map([['bay',['handbook','dou']], ['departure',[...pipelineGuides,'operator-notes']]]);
 
