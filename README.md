@@ -4,7 +4,7 @@
 
 Aman Sharma built this independent portfolio demo around a support engineer's everyday question: when a pipeline fails, which recovery procedure applies? The desk searches the selected application's documentation and cites the exact section and version. All operational data is synthetic.
 
-![Carrier Intake showing the CI-204 recovery procedure and its versioned runbook citation](assets/support-desk.png)
+![Carrier Intake workspace with the application sidebar, question field and a sourced CI-204 sample incident](assets/support-desk.png)
 
 ## Try a one-minute investigation
 

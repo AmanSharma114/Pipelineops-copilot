@@ -215,17 +215,24 @@ function supportDesk(app, scoped, q, retired, grants) {
   if (app === 'dispatch') examples.push(['Late release', 'What should I do when Dispatch Board misses its cutoff, and who can approve manual publication?']);
   const clauses = q.split(/(?:,?\s+and\s+|\?\s+)(?=(?:what|who|when|where|how|which|can\s+(?:I|we))\b)/i);
   const answer = q ? clauses.map((clause, i) => answerPart(app, scoped, q, clause, i === 0, clauses.length > 1)).join('') : '';
-  const incident = scoped.flatMap(doc => doc.sections).map(section => section.title.match(/^([A-Z]+-\d+) (.+)$/)).find(Boolean);
+  const incidentDoc = scoped.find(doc => doc.sections.some(section => /^[A-Z]+-\d+ /.test(section.title)));
+  const section = incidentDoc?.sections.find(section => /^[A-Z]+-\d+ /.test(section.title));
+  const incident = section?.title.match(/^([A-Z]+-\d+) (.+)$/);
   const askLink = question => '/?app=' + app + '&amp;q=' + encodeURIComponent(question) + '#answer';
-  const start = incident && !q ? `<div class="incident"><div><small>Sample incident</small>
-    <h2><code>${incident[1]}</code> ${esc(incident[2])}</h2></div><a href="${askLink('What does ' + incident[1] + ' mean?')}">Investigate <span aria-hidden="true">→</span></a></div>` : '';
-  return `<div class="overview"><div><small class="eyebrow">Application support</small><h1>Pipeline support desk</h1>
-    <p>Trace an incident from error code to recovery procedure.</p></div>${pipelineMap(app, grants)}</div>
-    <div class="layout"><div class="workspace"><h2 class="pipeline-name">${apps.get(app)}</h2>${start}
-    <form action="/#answer" method="get"><input type="hidden" name="app" value="${app}"><label for="q">Ask about ${apps.get(app)}</label>
-    <div class="compose"><input id="q" name="q" maxlength="320" required placeholder="Enter a question or error code…" value="${esc(q)}"><button>Ask ↗</button></div>
+  const start = incident && !q ? `<section class="incident"><small>Sample incident</small>
+    <h2><code>${incident[1]}</code> ${esc(incident[2])}</h2><p>${esc(section.body.split(/(?<=[.!?])\s+/)[0])}</p>
+    <small>${esc(incidentDoc.title)} · v${esc(incidentDoc.version)}</small>
+    <a href="${askLink('What does ' + incident[1] + ' mean?')}">Investigate incident →</a></section>` : '';
+  const options = [...apps].filter(([id]) => grants.has(id)).map(([id,name]) =>
+    `<option value="${id}"${id === app ? ' selected' : ''}>${name}</option>`).join('');
+  return `<div class="desk-shell">${pipelineMap(app, grants)}<div class="desk-content">
+    <form class="mobile-picker" action="/"><label for="application">Application</label><select id="application" name="app">${options}</select><button>Open</button></form>
+    <div class="desk-heading"><small class="eyebrow">Pipeline support desk</small><h1>${apps.get(app)}</h1>
+    <p>${pipelineRoles[app]} · ${scoped.length} source ${scoped.length === 1 ? 'document' : 'documents'}</p></div>
+    <div class="workspace"><form action="/#answer" method="get"><input type="hidden" name="app" value="${app}"><label for="q">Ask about ${apps.get(app)}</label>
+    <div class="compose"><input id="q" name="q" maxlength="320" required placeholder="Question or error code…" value="${esc(q)}"><button>Ask ↗</button></div>
     <div class="examples">${examples.map(([label,s]) => `<a title="${s}" href="${askLink(s)}">${label} ↗</a>`).join('')}</div></form>${answer}</div>
-    ${sourceLibrary(app,scoped,retired)}</div>`;
+    <div class="desk-resources">${start}${sourceLibrary(app,scoped,retired)}</div></div></div>`;
 }
 
 function page(main, status = 200) {

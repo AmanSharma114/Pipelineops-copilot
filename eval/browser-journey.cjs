@@ -46,8 +46,11 @@ async function journey(browser, mode, viewport, [app, name, code, evidence]) {
     await page.goto(origin);
     await checkWidth(page);
     assert.equal(await page.locator('.station a').count(), incidents.length);
-    await activate('.station a[href="/?app=' + app + '"]');
-    await page.locator('.station [aria-current="page"]').filter({hasText:name}).waitFor();
+    if (await page.locator('.mobile-picker').isVisible()) {
+      await page.selectOption('#application', app);
+      await activate('.mobile-picker button');
+    } else await activate('.station a[href="/?app=' + app + '"]');
+    await page.locator('h1').filter({hasText:name}).waitFor();
     if (mode === 'keyboard') {
       await tabTo(page, '#q');
       await page.keyboard.type(question);
