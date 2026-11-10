@@ -2,6 +2,8 @@
 
 **[Open the live support desk](https://pipelineops-freight-copilot.aamansharmamu114.chatgpt.site/)**
 
+[Present the two-minute interview demo](DEMO.md)
+
 Aman Sharma built this independent portfolio demo around a support engineer's everyday question: when a pipeline fails, which recovery procedure applies? The desk searches the selected application's documentation and cites the exact section and version. All operational data is synthetic.
 
 ![Carrier Intake workspace with the application sidebar, question field and a sourced CI-204 sample incident](assets/support-desk.png)
