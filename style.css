@@ -28,6 +28,11 @@ p, .station small { color: var(--muted) }
 .station [aria-current=page] { color: var(--lime) }
 .station [aria-current=page]:before { background: var(--lime); border-color: var(--lime); box-shadow: 0 0 0 4px #c1ed8b22 }
 .station small { font-size: 12px; display: block }
+.pipeline-group + .pipeline-group { margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--line) }
+.standalone { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; margin-top: 8px }
+.standalone .station::before,.standalone .station a::before { display: none }
+.standalone .station { border: 1px solid var(--line); border-radius: 7px; padding: 8px }
+.standalone .station a { padding-top: 0 }
 .layout { margin-top: 26px; display: grid; grid-template-columns: minmax(0,1.8fr) minmax(260px,1fr); gap: 22px; align-items: start }
 .workspace, aside, article { background: #161e2a; border: 1px solid var(--line); border-radius: 14px; padding: clamp(19px,2.1vw,30px) }
 h2 { font-size: 19px; line-height: 1.35 }

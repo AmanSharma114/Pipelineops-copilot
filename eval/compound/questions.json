@@ -115,5 +115,9 @@
     "app": "departure",
     "question": "What does GX-912 mean, and what is the gate event data flow?",
     "expected": [null, "flow#0"]
-  }
+  },
+  {"app":"meter","question":"What does MR-104 mean, and who approves interval corrections?","expected":["runbook#0","dou#0"]},
+  {"app":"learning","question":"What does LC-409 mean, and who approves revision corrections?","expected":["runbook#0","dou#0"]},
+  {"app":"meter","question":"What does LC-409 mean, and how do I restart safely?","expected":[null,"sop#0"]},
+  {"app":"learning","question":"What does MR-409 mean, and what is the enrollment data flow?","expected":[null,"flow#0"]}
 ]

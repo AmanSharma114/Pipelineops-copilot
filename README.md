@@ -2,7 +2,7 @@
 
 **[Open the live support desk](https://pipelineops-freight-copilot.aamansharmamu114.chatgpt.site/)**
 
-Aman Sharma built this independent portfolio demo around a support engineer's everyday question: when a pipeline fails, which recovery procedure applies? The desk searches the selected freight pipeline's documentation and cites the exact section and version. All operational data is synthetic.
+Aman Sharma built this independent portfolio demo around a support engineer's everyday question: when a pipeline fails, which recovery procedure applies? The desk searches the selected application's documentation and cites the exact section and version. All operational data is synthetic.
 
 ![Carrier Intake showing the CI-204 recovery procedure and its versioned runbook citation](assets/support-desk.png)
 
@@ -22,13 +22,26 @@ flowchart LR
 
 Bay Planner allocates loading slots and checks for conflicting occupancy. Departure Monitor reconciles gate scans against the released bay plan. Each has a handbook, operating procedure, support agreement (DOU), architecture and data-flow specification, and troubleshooting runbook. [Investigate a bay collision](https://pipelineops-freight-copilot.aamansharmamu114.chatgpt.site/?app=bay&q=BP-307) or [trace an unmatched gate departure](https://pipelineops-freight-copilot.aamansharmamu114.chatgpt.site/?app=departure&q=GM-307).
 
+### Independent pipelines
+
+**Meter Rollup** reads quarter-hour electricity readings from a synthetic meter-gateway export and produces one watt-hour total per meter and UTC hour. **Learning Completion Sync** reads events from a synthetic learning-system export and reconciles the current course status per learner. Each job has its own source, output, operating schedule, support owner, incident codes, and five support guides. Both run directly from their own inputs.
+
+From the project root, run either sample with Node.js:
+
+```sh
+node batches/run.mjs meter
+node batches/run.mjs learning
+```
+
+Pass an optional JSON file as the final argument to use another export. Each job writes results to standard output after validating the full batch. The schedules described in the handbooks are reference operating schedules; the public desk provides cited support guidance. [Investigate a missing meter interval](https://pipelineops-freight-copilot.aamansharmamu114.chatgpt.site/?app=meter&q=MR-104) or [investigate a conflicting course revision](https://pipelineops-freight-copilot.aamansharmamu114.chatgpt.site/?app=learning&q=LC-409).
+
 ### Application and document permissions
 
 The backend checks an explicit application/document allowlist before ranking sections or resolving citations. The selector, suggested incidents, source library, index status, and withdrawal notices use the caller's grants. New document IDs require an explicit grant.
 
 | Caller | Applications and documents available |
 | --- | --- |
-| Anonymous visitor | Published demo documents across all five applications |
+| Anonymous visitor | Published demo documents across all seven applications |
 | Gate operator demo account | Bay Planner handbook and DOU; all Departure Monitor guides, including the synthetic shift notes |
 
 To exercise the operator account locally, supply a strong `GATE_OPERATOR_PASSWORD` through the process environment before running `npm start`. Open `/operator` and sign in with HTTP Basic username `gate`. Hosted activation requires the equivalent Worker secret and HTTPS. With no password configured the operator route returns 401. The public demo uses the anonymous scope. The optional account demonstrates server-side authorization with fictional data; the repository itself is public.
@@ -39,13 +52,13 @@ For a two-document investigation, select Dispatch Board and choose **Late releas
 2. Follow the citation beneath the excerpt. The source viewer highlights the matching section of runbook v1.2.
 3. Try [the same error code under Route Ledger](https://pipelineops-freight-copilot.aamansharmamu114.chatgpt.site/?app=ledger&q=CI-204). The backend searches only that pipeline and reports insufficient evidence.
 
-On the current 139 labeled questions, the deployed handler produced 131 expected outcomes. It declined eight supported questions and returned zero wrong citations. Run `node eval.mjs` to verify the versioned excerpt and source section for each supported answer.
+On the current 153 labeled questions, the deployed handler produced 145 expected outcomes. It declined eight supported questions and returned zero wrong citations. Run `node eval.mjs` to verify the versioned excerpt and source section for each supported answer.
 
 ### Multi-part answer evaluation
 
-Run `npm run eval:compound` to check sixteen multi-part questions across all five pipelines. The suite scores each question as complete only when the part count and order match and every part passes. For supported parts it follows the versioned citation and compares the excerpt to the selected source section. For unsupported parts it requires an explicit abstention with no answer citation.
+Run `npm run eval:compound` to check twenty multi-part questions across all seven applications. The suite scores each question as complete only when the part count and order match and every part passes. For supported parts it follows the versioned citation and compares the excerpt to the selected source section. For unsupported parts it requires an explicit abstention with no answer citation.
 
-The first run passed 11/12 questions. A schedule question followed by “and can I force a restart” had been treated as one request. After recognizing that clause boundary, all 12 questions passed, including all seven mixed-evidence cases. All 14 supported parts cited the expected passage and all 11 unsupported parts abstained. After adding Bay Planner and Departure Monitor, the expanded suite verified 20/20 citations, 13/13 abstentions, and 9/9 mixed-evidence questions.
+The first run passed 11/12 questions. A schedule question followed by “and can I force a restart” had been treated as one request. After recognizing that clause boundary, all 12 questions passed, including all seven mixed-evidence cases. All 14 supported parts cited the expected passage and all 11 unsupported parts abstained. After adding Bay Planner and Departure Monitor, the expanded suite verified 20/20 citations, 13/13 abstentions, and 9/9 mixed-evidence questions. With the independent pipelines, the current suite verifies 26/26 citations and 15/15 abstentions.
 
 ### Local request latency
 
@@ -53,7 +66,7 @@ The first run passed 11/12 questions. A schedule question followed by “and can
 
 ## Run locally
 
-The optional browser check follows one incident in each of the five pipelines from selection to the cited passage and back. With Playwright available to Node and its Chromium browser installed, run `node eval/browser-journey.cjs <origin>` against a running desk. To use installed Microsoft Edge, set `PLAYWRIGHT_CHANNEL=msedge`. It checks desktop mouse, emulated touch at two widths, and keyboard-only navigation.
+The optional browser check follows one incident in each of the seven applications from selection to the cited passage and back. With Playwright available to Node and its Chromium browser installed, run `node eval/browser-journey.cjs <origin>` against a running desk. To use installed Microsoft Edge, set `PLAYWRIGHT_CHANNEL=msedge`. It checks desktop mouse, emulated touch at two widths, and keyboard-only navigation.
 
 Use Node.js 22 or newer. From this directory run `npm start` and open http://127.0.0.1:4173. Use `npm test` for the retrieval and route checks. Neither command requires installing packages or configuring secrets.
 
@@ -69,7 +82,7 @@ flowchart LR
   A --> V[Versioned source viewer]
 ```
 
-The build embeds sixteen publicly searchable synthetic documents with thirty-seven sections in a single Fetch-compatible Worker. The anonymous demo grants access to the published documents in all five pipelines. Search filters the index before ranking. Title matches carry more weight than body matches. Identifier-like terms must match, and tied scores yield an abstention. The citation viewer resolves pipeline, document, version and section. All source changes require a rebuild.
+The build embeds twenty-six publicly searchable synthetic documents with fifty-seven sections in a single Fetch-compatible Worker. The anonymous demo grants access to the published documents in all seven applications. Search filters the index before ranking. Title matches carry more weight than body matches. Identifier-like terms must match, and tied scores yield an abstention. The citation viewer resolves pipeline, document, version and section. All source changes require a rebuild.
 
 An extractive baseline makes grounding inspectable and keeps query costs independent of model tokens. Lexical overlap is an approximation of relevance. Paraphrases, negation, and questions requiring several sections need separate evaluation. There is no language model or embedding service in this milestone.
 

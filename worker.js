@@ -1,4 +1,4 @@
-const apps = new Map([['intake','Carrier Intake'],['ledger','Route Ledger'],['dispatch','Dispatch Board'],['bay','Bay Planner'],['departure','Departure Monitor']]);
+const apps = new Map([['intake','Carrier Intake'],['ledger','Route Ledger'],['dispatch','Dispatch Board'],['bay','Bay Planner'],['departure','Departure Monitor'],['meter','Meter Rollup'],['learning','Learning Completion Sync']]);
 // Only fold numeric suffixes for namespaces actually used by the runbooks.
 // This keeps ordinary phrases such as "at 15" and dotted job names intact.
 const namespaces = new Set(documents.flatMap(doc => doc.sections.flatMap(section =>
@@ -146,16 +146,23 @@ const pipelineRoles = {
   ledger: 'Reconcile route stops',
   dispatch: 'Publish loading plans',
   bay: 'Allocate loading bays',
-  departure: 'Reconcile gate events'
+  departure: 'Reconcile gate events',
+  meter: 'Aggregate electricity readings',
+  learning: 'Reconcile course completions'
 };
 
 function pipelineMap(active, grants) {
+  const group = (label, ids, standalone = false) => {
+    const visible = ids.filter(id => grants.has(id));
+    if (!visible.length) return '';
+    return `<div class="pipeline-group"><div class="flow-label">${label}</div>
+    <div class="stations${standalone ? ' standalone' : ''}">${visible.map(id => `<div class="station">
+      <a aria-current="${id === active ? 'page' : 'false'}" href="/?app=${id}">${apps.get(id)}</a>
+      <small>${pipelineRoles[id]}</small></div>`).join('')}</div></div>`;
+  };
   return `<nav class="flow" aria-label="Select a pipeline">
-    <div class="flow-label">Freight data flow</div>
-    <div class="stations">${[...apps].filter(([id]) => grants.has(id)).map(([id, name]) => `<div class="station">
-      <a aria-current="${id === active ? 'page' : 'false'}" href="/?app=${id}">${name}</a>
-      <small>${pipelineRoles[id]}</small></div>`).join('')}</div>
-  </nav>`;
+    ${group('Freight data flow', ['intake','ledger','dispatch','bay','departure'])}
+    ${group('Independent pipelines', ['meter','learning'], true)}</nav>`;
 }
 
 function sourceLibrary(app, scoped, retired) {
@@ -211,7 +218,7 @@ function supportDesk(app, scoped, q, retired, grants) {
   const askLink = question => '/?app=' + app + '&amp;q=' + encodeURIComponent(question) + '#answer';
   const start = incident && !q ? `<div class="incident"><div><small>Sample incident</small>
     <h2><code>${incident[1]}</code> ${esc(incident[2])}</h2></div><a href="${askLink('What does ' + incident[1] + ' mean?')}">Investigate <span aria-hidden="true">→</span></a></div>` : '';
-  return `<div class="overview"><div><small class="eyebrow">Freight operations</small><h1>Pipeline support desk</h1>
+  return `<div class="overview"><div><small class="eyebrow">Application support</small><h1>Pipeline support desk</h1>
     <p>Trace an incident from error code to recovery procedure.</p></div>${pipelineMap(app, grants)}</div>
     <div class="layout"><div class="workspace"><h2 class="pipeline-name">${apps.get(app)}</h2>${start}
     <form action="/#answer" method="get"><input type="hidden" name="app" value="${app}"><label for="q">Ask about ${apps.get(app)}</label>
@@ -227,7 +234,8 @@ function page(main, status = 200) {
 const pipelineGuides = ['handbook','sop','dou','flow','runbook'];
 export const publicGrants = new Map([
   ['intake',['runbook','retention','validation']], ['ledger',['runbook']],
-  ['dispatch',['handbook','runbook','handoff']], ['bay',pipelineGuides], ['departure',pipelineGuides]
+  ['dispatch',['handbook','runbook','handoff']], ['bay',pipelineGuides], ['departure',pipelineGuides],
+  ['meter',pipelineGuides], ['learning',pipelineGuides]
 ]);
 const gateGrants = new Map([['bay',['handbook','dou']], ['departure',[...pipelineGuides,'operator-notes']]]);
 

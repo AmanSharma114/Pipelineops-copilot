@@ -8,7 +8,9 @@ const incidents = [
   ['ledger', 'Route Ledger', 'RL-410', 'Quarantine the conflicting pair'],
   ['dispatch', 'Dispatch Board', 'DB-410', '08:05 UTC'],
   ['bay', 'Bay Planner', 'BP-307', 'overlap.csv'],
-  ['departure', 'Departure Monitor', 'GM-307', 'freight.gate_pending']
+  ['departure', 'Departure Monitor', 'GM-307', 'freight.gate_pending'],
+  ['meter', 'Meter Rollup', 'MR-104', 'four distinct quarter-hour intervals'],
+  ['learning', 'Learning Completion Sync', 'LC-409', 'authoritative status']
 ];
 
 async function tabTo(page, selector) {

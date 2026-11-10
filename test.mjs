@@ -9,12 +9,30 @@ import { join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { readCurrentDocuments } from './sync.mjs';
 import { randomUUID } from 'node:crypto';
+import { rollup } from './batches/meter/run.mjs';
+import { reconcile } from './batches/learning/run.mjs';
 
-test('Five selectable pipelines isolate incident lookups across all 25 app/code pairs', async () => {
+test('Meter batch sums unique intervals and rejects conflicting or incomplete hours', async () => {
+  const rows = JSON.parse(await readFile('batches/meter/sample.json','utf8'));
+  assert.deepEqual(rollup(rows), [{meter:'MTR-07', hour:'2026-10-01T09:00:00Z', wh:750}]);
+  assert.deepEqual(rollup([...rows].reverse()), rollup(rows));
+  assert.throws(() => rollup(rows.slice(1)), /MR-104/);
+  assert.throws(() => rollup([...rows, {...rows[0], wh:2}]), /MR-409/);
+});
+
+test('Learning batch keeps latest revisions and detects conflicts even on older events', async () => {
+  const rows = JSON.parse(await readFile('batches/learning/sample.json','utf8'));
+  assert.deepEqual(reconcile(rows).map(row => [row.revision, row.status]), [[2,'completed'],[3,'revoked']]);
+  assert.deepEqual(reconcile([...rows].reverse()), reconcile(rows));
+  assert.throws(() => reconcile([...rows, {...rows[1], status:'revoked'}]), /LC-409/);
+});
+
+test('Seven selectable applications isolate incident lookups across all 49 app/code pairs', async () => {
   const fixtures = [
     ['intake','CI-204','ready marker'], ['ledger','RL-410','conflicting pair'],
     ['dispatch','DB-410','08:05 UTC'], ['bay','BP-307','overlap.csv'],
-    ['departure','GM-307','freight.gate_pending']
+    ['departure','GM-307','freight.gate_pending'], ['meter','MR-104','missing reading'],
+    ['learning','LC-409','authoritative status']
   ];
   const home = await get('/').text();
   for (const [app] of fixtures) {
@@ -50,7 +68,7 @@ test('Server grants apply to selection, searches, suggestions, library, index st
   assert.ok(!html.includes('href="/?app=intake"'));
   assert.equal(visit(privateSource, {authorization}).status, 200);
   assert.equal(visit(desk + '&q=anything', {authorization:'Bearer unknown'}).status, 401);
-  for (const path of ['/?app=ledger','/index-status?app=intake','/source?app=dispatch&doc=handoff&v=1.0','/source?app=bay&doc=runbook&v=1.0']) {
+  for (const path of ['/?app=ledger','/index-status?app=intake','/source?app=dispatch&doc=handoff&v=1.0','/source?app=bay&doc=runbook&v=1.0','/?app=meter','/source?app=learning&doc=runbook&v=1.0']) {
     assert.equal(visit(path, {authorization}).status, 404);
   }
   const bayStatus = await visit('/index-status?app=bay', {authorization}).text();

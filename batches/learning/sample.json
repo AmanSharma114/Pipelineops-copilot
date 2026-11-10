@@ -1,0 +1,26 @@
+[
+  {
+    "learner": "L-09",
+    "course": "LAB-101",
+    "revision": 2,
+    "status": "completed"
+  },
+  {
+    "learner": "L-09",
+    "course": "LAB-101",
+    "revision": 1,
+    "status": "assigned"
+  },
+  {
+    "learner": "L-14",
+    "course": "LAB-202",
+    "revision": 3,
+    "status": "revoked"
+  },
+  {
+    "learner": "L-09",
+    "course": "LAB-101",
+    "revision": 2,
+    "status": "completed"
+  }
+]
