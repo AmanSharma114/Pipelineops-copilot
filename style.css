@@ -67,6 +67,9 @@ li { margin-block: 6px }
 .answer>small { color: var(--lime) }
 .answer h2,article h2 { margin: 8px 0 }
 #answer { scroll-margin-top: 16px }
+.examples { flex-wrap: wrap }
+.clause { margin-top: 24px; padding-top: 18px; border-top: 1px solid var(--line); color: var(--blue) }
+.clause + .answer { margin-top: 8px; padding-top: 0; border-top: 0 }
 .answer p, article p { color: #d2dce7; line-height: 1.72 }
 .answer>a { display: inline-block; margin-top: 15px; font-size: 14px }
 .section-choices ul { list-style: none; padding: 0; margin: 14px 0 0 }

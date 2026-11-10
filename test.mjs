@@ -128,6 +128,38 @@ test('Index status reflects deployed versions and links only within its pipeline
   assert.equal(get('/index-status?app=unknown').status, 404);
 });
 const ask = (app,q) => get('/?'+ new URLSearchParams({app,q})).text();
+test('Cutoff and approval excerpts cite independent sections and retain the complete question', async () => {
+  const question = 'What should I do when Dispatch Board misses its cutoff, and who can approve manual publication?';
+  const html = await ask('dispatch', question);
+  const parts = [...html.matchAll(/<section class="answer">([\s\S]*?)<\/section>/g)];
+  assert.equal(parts.length, 2);
+  assert.equal((html.match(/id="answer"/g) || []).length, 1);
+  for (const [i, expected] of ['doc=runbook&v=1.1#s1','doc=handbook&v=1.1#s0'].entries()) {
+    const [, excerpt, link] = parts[i][1].match(/<p>(.*?)<\/p><a href="([^"]+)"/s);
+    assert.ok(link.endsWith(expected));
+    const url = new URL(link, 'https://test.invalid');
+    assert.equal(url.searchParams.get('q'), question);
+    const source = await get(link).text();
+    assert.ok(source.split('id="' + url.hash.slice(1) + '"')[1].split('</section>')[0].includes(excerpt));
+  }
+});
+test('Unsupported compound question parts abstain independently within the pipeline', async () => {
+  for (const [app, question, states] of [
+    ['dispatch','What is the upstream release deadline, and who approves payroll?', [true,false]],
+    ['dispatch','What is the weekend cutoff? Who approves manual publication?', [false,true]],
+    ['intake','What is the DB-410 deadline, and who can approve manual publication?', [false,false]]
+  ]) {
+    const html = await ask(app, question);
+    const parts = [...html.matchAll(/<section class="answer">([\s\S]*?)<\/section>/g)];
+    assert.deepEqual(parts.map(part => part[1].includes('SOURCE EXCERPT')), states);
+    for (const [i, part] of parts.entries()) {
+      if (!states[i]) {
+        assert.ok(part[1].includes('INSUFFICIENT EVIDENCE'));
+        assert.ok(!part[1].includes('href='));
+      }
+    }
+  }
+});
 test('Deadline lookup cites a timed procedure and respects unsupported qualifiers', async () => {
   const html = await ask('dispatch','What time is the upstream release deadline?');
   assert.match(html, /08:05 UTC/);
@@ -237,7 +269,7 @@ test('Dispatch Board navigation, library, and suggested questions work together'
     assert.equal(get(path).status, 200);
   }
   const examples = [...desk.matchAll(/href="(\/\?app=dispatch&amp;q=[^"]+)"/g)];
-  assert.equal(examples.length, 3);
+  assert.equal(examples.length, 4);
   for (const [, link] of examples) {
     const response = await get(link.replace('&amp;', '&')).text();
     assert.match(response, /class="answer"><small>SOURCE EXCERPT/);

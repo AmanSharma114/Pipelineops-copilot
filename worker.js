@@ -81,7 +81,8 @@ function supportsFact(row, query, fact) {
     const normalized = text => terms(text.replace(/\b(?:deadline|cutoff)\b/gi, 'cutoff')
       .replace(/\bmiss(?:es|ed|ing)?\b/gi, 'miss'));
     const evidence = normalized(row.section.title + ' ' + row.section.body);
-    return normalized(query.replace(/^what time\b/i, '')).every(term => evidence.includes(term));
+    const subject = query.toLowerCase().replace(apps.get(row.doc.app).toLowerCase(), '').replace(/^what time\b|\bits\b/g, '');
+    return normalized(subject).every(term => evidence.includes(term));
   }
   if (fact === 'frequency') return frequencyMatch(row, query);
   if (fact === 'writer') {
@@ -95,7 +96,7 @@ function supportsFact(row, query, fact) {
   }
   const relation = fact === 'approval' ? approval : retention;
   const extract = fact === 'approval' ? approvalTerms : factTerms;
-  const requested = extract(query.replace(relation, ''));
+  const requested = extract(query.replace(/^who can\b/i, 'who').replace(relation, ''));
   if (!requested.length) return false;
   return row.section.body.split(/(?<=[.!?])\s+/).some(sentence => {
     if (!relation.test(sentence)) return false;
@@ -182,7 +183,9 @@ function indexStatus(app, current) {
     <h2>Document versions</h2><ul>${rows.join('')}</ul></article>`;
 }
 
-function supportDesk(app, scoped, q, matches) {
+function answerPart(app, q, clause, first, compound) {
+  const matches = retrieve(app, clause);
+  const anchor = ' id="answer" tabindex="-1"';
   const hit = matches.length === 1 ? matches[0] : null;
   const ambiguous = matches.length > 1;
   const fallback = ambiguous ? 'Several sections match equally well. Open one below or add detail to your question.'
@@ -190,22 +193,30 @@ function supportDesk(app, scoped, q, matches) {
   const choices = ambiguous ? `<nav class="section-choices" aria-label="Matching source sections"><ul>
     ${matches.map(({doc, section, i}) => `<li><a href="${href(app, doc, q)}#s${i}">${esc(section.title)}</a>
       <small>${esc(doc.title)} · v${esc(doc.version)}</small></li>`).join('')}</ul></nav>` : '';
+  const answer = `<section class="answer"><small>${hit ? 'SOURCE EXCERPT' : 'INSUFFICIENT EVIDENCE'}</small>
+    <h2${first && !compound ? anchor : ''}>${hit ? esc(hit.section.title) : ambiguous ? 'Choose a source section' : 'No confident match'}</h2><p>${hit ? esc(hit.section.body) : fallback}</p>${hit ? `<a href="${href(app,hit.doc,q)}#s${hit.i}">${esc(hit.doc.title)} · v${hit.doc.version} · ${esc(hit.section.title)} ↗</a>` : ''}</section>`;
+  const label = compound ? `<h2 class="clause"${first ? anchor : ''}>${esc(clause)}</h2>` : '';
+  return label + answer + choices;
+}
+
+function supportDesk(app, scoped, q) {
   const examples = [
     ['Schedule', 'What triggers this pipeline?'],
     ['Recovery', 'How do I restart safely?']
   ];
+  if (app === 'dispatch') examples.push(['Late release', 'What should I do when Dispatch Board misses its cutoff, and who can approve manual publication?']);
+  const clauses = q.split(/(?:,?\s+and\s+|\?\s+)(?=(?:what|who|when|where|how|which)\b)/i);
+  const answer = q ? clauses.map((clause, i) => answerPart(app, q, clause, i === 0, clauses.length > 1)).join('') : '';
   const incident = scoped.flatMap(doc => doc.sections).map(section => section.title.match(/^([A-Z]+-\d+) (.+)$/)).find(Boolean);
   const askLink = question => '/?app=' + app + '&amp;q=' + encodeURIComponent(question) + '#answer';
   const start = incident && !q ? `<div class="incident"><div><small>Sample incident</small>
     <h2><code>${incident[1]}</code> ${esc(incident[2])}</h2></div><a href="${askLink('What does ' + incident[1] + ' mean?')}">Investigate <span aria-hidden="true">→</span></a></div>` : '';
-  const answer = q ? `<section class="answer"><small>${hit ? 'SOURCE EXCERPT' : 'INSUFFICIENT EVIDENCE'}</small>
-    <h2 id="answer" tabindex="-1">${hit ? esc(hit.section.title) : ambiguous ? 'Choose a source section' : 'No confident match'}</h2><p>${hit ? esc(hit.section.body) : fallback}</p>${hit ? `<a href="${href(app,hit.doc,q)}#s${hit.i}">${esc(hit.doc.title)} · v${hit.doc.version} · ${esc(hit.section.title)} ↗</a>` : ''}</section>` : '';
   return `<div class="overview"><div><small class="eyebrow">Freight operations</small><h1>Pipeline support desk</h1>
     <p>Trace an incident from error code to recovery procedure.</p></div>${pipelineMap(app)}</div>
     <div class="layout"><div class="workspace"><h2 class="pipeline-name">${apps.get(app)}</h2>${start}
     <form action="/#answer" method="get"><input type="hidden" name="app" value="${app}"><label for="q">Ask about ${apps.get(app)}</label>
     <div class="compose"><input id="q" name="q" maxlength="320" required placeholder="Enter a question or error code…" value="${esc(q)}"><button>Ask ↗</button></div>
-    <div class="examples">${examples.map(([label,s]) => `<a title="${s}" href="${askLink(s)}">${label} ↗</a>`).join('')}</div></form>${answer}${choices}</div>
+    <div class="examples">${examples.map(([label,s]) => `<a title="${s}" href="${askLink(s)}">${label} ↗</a>`).join('')}</div></form>${answer}</div>
     ${sourceLibrary(app,scoped)}</div>`;
 }
 
@@ -235,6 +246,5 @@ export default { fetch(request) {
   if(pathname !== '/') return new Response('Unknown page',{status:404});
   const q = (p.get('q') || '').trim();
   if(q.length > 320) return new Response('Question exceeds 320 characters',{status:400});
-  const matches = q ? retrieve(app,q) : [];
-  return page(supportDesk(app, scoped, q, matches));
+  return page(supportDesk(app, scoped, q));
 }};

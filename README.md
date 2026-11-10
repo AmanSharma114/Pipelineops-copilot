@@ -8,6 +8,8 @@ Aman Sharma built this independent portfolio demo around a support engineer's ev
 
 ## Try a one-minute investigation
 
+For a two-document investigation, select Dispatch Board and choose **Late release**. The desk retrieves the missed-cutoff procedure from the runbook and publication authority from the handbook. Each passage has its own versioned citation. Explicit follow-up clauses such as “and who …” are searched independently within the selected pipeline. A missing passage leaves that part marked as insufficient evidence.
+
 1. Open [Carrier Intake's CI-204 incident](https://pipelineops-freight-copilot.aamansharmamu114.chatgpt.site/?app=intake&q=CI-204). The runbook explains why the missing ready marker matters and what the engineer should ask the carrier to resend.
 2. Follow the citation beneath the excerpt. The source viewer highlights the matching section of runbook v1.2.
 3. Try [the same error code under Route Ledger](https://pipelineops-freight-copilot.aamansharmamu114.chatgpt.site/?app=ledger&q=CI-204). The backend searches only that pipeline and reports insufficient evidence.
