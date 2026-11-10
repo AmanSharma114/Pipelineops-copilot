@@ -6,6 +6,8 @@
 
 [Portfolio description and resume bullets](PORTFOLIO.md)
 
+**[Run the local LLM RAG example](local-rag/README.md)** to generate answers on your CPU from the desk's permission-filtered passages. Includes a verified two-source example and requires no API key.
+
 Aman Sharma built this independent portfolio demo around a support engineer's everyday question: when a pipeline fails, which recovery procedure applies? The desk searches the selected application's documentation and cites the exact section and version. All operational data is synthetic.
 
 ![Carrier Intake workspace with the application sidebar, question field and a sourced CI-204 sample incident](assets/support-desk.png)

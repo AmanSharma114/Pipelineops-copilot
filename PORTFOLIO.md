@@ -10,11 +10,11 @@ When a pipeline fails, a support engineer needs to know which recovery procedure
 
 > I built the retrieval layer first because a plausible recovery instruction for the wrong application can be harmful. At build time I split versioned support documents by heading and index their current sections. At request time the backend limits candidates to documents the caller can read for the selected application. It ranks those sections using text and technical identifiers. When one passage has sufficient evidence, the desk quotes it and links to its exact version and section. A two-part question can retrieve two independently cited passages.
 
-**Where RAG fits.** This release implements retrieval and evidence selection. Its answer renderer copies the selected passages. LLM-based generation remains an open milestone for the full retrieval-augmented generation system.
+**Where RAG fits.** The public desk returns exact passages. The GitHub project also runs end-to-end RAG locally: a quantized Qwen model generates answers from the same permission-filtered passages and the application attaches source links. [Run the example](local-rag/README.md)
 
 **Why start with lexical search?** Similar incident codes can refer to different failures, and an exact match is inexpensive to inspect and test. I compared this baseline with an offline MiniLM embedding fallback. In the first 56-question comparison it recovered two supported paraphrases but also introduced one incorrect citation. I kept the extractive baseline available for comparison as the corpus grew. [Experiment and results](README.md#semantic-fallback-experiment)
 
-**What I would build next.** Start with one multi-source incident. Pass only authorized retrieved passages and their source IDs to a language model. Require a citation for each operational claim and check the claims against the actual passages, including when one part of the question lacks evidence. Compare generated answers with the extractive baseline on unsupported instructions, application isolation, latency, and cost before enabling generation for public visitors.
+**Next evaluation.** Compare locally generated answers against the cited passages for unsupported claims, omitted recovery steps, and correct abstentions. The published retrieval scores apply to the extractive path.
 
 ## Resume bullets
 

@@ -1,4 +1,5 @@
 dist/
+*.gguf
 .sync-cache/
 *.tgz
 node_modules/
