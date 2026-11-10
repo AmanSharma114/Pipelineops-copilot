@@ -195,15 +195,15 @@ function supportDesk(app, scoped, q, matches) {
     ['Recovery', 'How do I restart safely?']
   ];
   const incident = scoped.flatMap(doc => doc.sections).map(section => section.title.match(/^([A-Z]+-\d+) (.+)$/)).find(Boolean);
-  const askLink = question => '/?app=' + app + '&amp;q=' + encodeURIComponent(question);
+  const askLink = question => '/?app=' + app + '&amp;q=' + encodeURIComponent(question) + '#answer';
   const start = incident && !q ? `<div class="incident"><div><small>Sample incident</small>
     <h2><code>${incident[1]}</code> ${esc(incident[2])}</h2></div><a href="${askLink('What does ' + incident[1] + ' mean?')}">Investigate <span aria-hidden="true">→</span></a></div>` : '';
   const answer = q ? `<section class="answer"><small>${hit ? 'SOURCE EXCERPT' : 'INSUFFICIENT EVIDENCE'}</small>
-    <h2 id="answer">${hit ? esc(hit.section.title) : ambiguous ? 'Choose a source section' : 'No confident match'}</h2><p>${hit ? esc(hit.section.body) : fallback}</p>${hit ? `<a href="${href(app,hit.doc,q)}#s${hit.i}">${esc(hit.doc.title)} · v${hit.doc.version} · ${esc(hit.section.title)} ↗</a>` : ''}</section>` : '';
+    <h2 id="answer" tabindex="-1">${hit ? esc(hit.section.title) : ambiguous ? 'Choose a source section' : 'No confident match'}</h2><p>${hit ? esc(hit.section.body) : fallback}</p>${hit ? `<a href="${href(app,hit.doc,q)}#s${hit.i}">${esc(hit.doc.title)} · v${hit.doc.version} · ${esc(hit.section.title)} ↗</a>` : ''}</section>` : '';
   return `<div class="overview"><div><small class="eyebrow">Freight operations</small><h1>Pipeline support desk</h1>
     <p>Trace an incident from error code to recovery procedure.</p></div>${pipelineMap(app)}</div>
     <div class="layout"><div class="workspace"><h2 class="pipeline-name">${apps.get(app)}</h2>${start}
-    <form action="/" method="get"><input type="hidden" name="app" value="${app}"><label for="q">Ask about ${apps.get(app)}</label>
+    <form action="/#answer" method="get"><input type="hidden" name="app" value="${app}"><label for="q">Ask about ${apps.get(app)}</label>
     <div class="compose"><input id="q" name="q" maxlength="320" required placeholder="Enter a question or error code…" value="${esc(q)}"><button>Ask ↗</button></div>
     <div class="examples">${examples.map(([label,s]) => `<a title="${s}" href="${askLink(s)}">${label} ↗</a>`).join('')}</div></form>${answer}${choices}</div>
     ${sourceLibrary(app,scoped)}</div>`;

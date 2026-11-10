@@ -20,6 +20,8 @@ On the current 125 labeled questions, the deployed handler produced 117 expected
 
 ## Run locally
 
+The optional browser check follows Route Ledger's RL-410 incident from pipeline selection to the cited passage and back. With Playwright available to Node and its Chromium browser installed, run `node eval/browser-journey.cjs <origin>` against a running desk. To use installed Microsoft Edge, set `PLAYWRIGHT_CHANNEL=msedge`. It checks desktop mouse, emulated touch at two widths, and keyboard-only navigation.
+
 Use Node.js 22 or newer. From this directory run `npm start` and open http://127.0.0.1:4173. Use `npm test` for the retrieval and route checks. Neither command requires installing packages or configuring secrets.
 
 ## First milestone
