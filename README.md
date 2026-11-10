@@ -1,14 +1,23 @@
 # PipelineOps Copilot
 
-**[Open the live support desk](https://pipelineops-freight-copilot.aamansharmamu114.chatgpt.site/)**
+PipelineOps Copilot helps support engineers find the recovery procedure for the application they’re supporting. The public desk shows exact passages from synthetic runbooks. The local RAG example uses those same permission-filtered passages to generate cited answers on CPU.
 
-[Present the two-minute interview demo](DEMO.md)
+**[Try the live support desk](https://pipelineops-freight-copilot.aamansharmamu114.chatgpt.site/)** · **[See the local AI RAG example](local-rag/README.md)**
 
-[Portfolio description and resume bullets](PORTFOLIO.md)
+## A real RAG trace from Dispatch Board
 
-**[Run the local LLM RAG example](local-rag/README.md)** to generate answers on your CPU from the desk's permission-filtered passages. Includes a verified two-source example and requires no API key.
+> What should I do when Dispatch Board misses its cutoff, and who can approve manual publication?
 
-Aman Sharma built this independent portfolio demo around a support engineer's everyday question: when a pipeline fails, which recovery procedure applies? The desk searches the selected application's documentation and cites the exact section and version. All operational data is synthetic.
+The retriever found one passage for each part. Here are excerpts from those passages alongside the answers Qwen generated in the recorded local run.
+
+| Retrieved evidence | Generated answer | Citation |
+| --- | --- | --- |
+| “Check the release marker against the ledger partition ID. Ask Routing Operations to confirm release before retrying publication. Leave the board pointer unchanged until the marker is present.” | “Check the release marker against the ledger partition ID. Ask Routing Operations to confirm release before retrying publication.” | [Runbook v1.1 · DB-410 missing release](https://pipelineops-freight-copilot.aamansharmamu114.chatgpt.site/source?app=dispatch&doc=runbook&v=1.1#s1) |
+| “Dispatch Operations owns the board and approves manual publication of the board.” | “Dispatch Operations” | [Handbook v1.1 · Support ownership](https://pipelineops-freight-copilot.aamansharmamu114.chatgpt.site/source?app=dispatch&doc=handbook&v=1.1#s0) |
+
+**What the model missed.** The recovery answer omitted the instruction to leave the board pointer unchanged until the marker is present. Following the first citation reveals the missing step.
+
+[Two-minute interview demo](DEMO.md) · [Portfolio description and resume bullets](PORTFOLIO.md)
 
 ![Carrier Intake workspace with the application sidebar, question field and a sourced CI-204 sample incident](assets/support-desk.png)
 
